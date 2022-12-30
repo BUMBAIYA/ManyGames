@@ -4,6 +4,7 @@ import useEvent from "../../hooks/useEvent";
 import GameTile from "./GameTile";
 import GameOverlay from "./GameOverlay";
 import GameDetails from "./GameDetails";
+import "../../styles/scss/2048.scss";
 
 type GameBoardProps = {
   size?: number;
@@ -51,6 +52,16 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
 
   useEvent("keydown", handleKeyDown, false);
 
+  const cells = board.cells.map((row, rowIndex) => {
+    return (
+      <div key={rowIndex}>
+        {row.map((_, colIndex) => {
+          return <div className="cell" key={colIndex} />;
+        })}
+      </div>
+    );
+  });
+
   const tiles = board.tiles
     .filter((_tile) => _tile.value !== 0)
     .map((_t, index) => {
@@ -65,30 +76,16 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
     <div className="flex h-screen justify-center bg-gray-100">
       <div>
         <GameDetails score={board.score} resetGame={handleResetGame} />
-        <div className="relative">
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(${size}, 14vmin)`,
-              gridTemplateRows: `repeat(${size}, 14vmin)`,
-            }}
-            className="gap-[1vmin] rounded-[1vmin]"
-          >
-            {Array.from({ length: size * size }, (_, index) => {
-              return (
-                <div
-                  key={index}
-                  className="h-[14vmin] w-[14vmin] rounded-[1vmin] bg-gray-300/70"
-                ></div>
-              );
-            })}
+        <div>
+          <div className="board">
+            {cells}
             {tiles}
+            <GameOverlay
+              onRestart={handleResetGame}
+              hasLost={board.hasLost()}
+              hasWon={board.hasWon()}
+            />
           </div>
-          <GameOverlay
-            onRestart={handleResetGame}
-            hasLost={board.hasLost()}
-            hasWon={board.hasWon()}
-          />
         </div>
       </div>
     </div>

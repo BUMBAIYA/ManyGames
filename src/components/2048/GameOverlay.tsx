@@ -24,7 +24,7 @@ export default function GameOverlay(props: GameOverlayProps) {
   }
   if (props.hasLost) {
     return (
-      <div className="absolute top-0 left-0 flex h-full w-full animate-show flex-col items-center justify-center rounded-[1vmin] bg-white bg-opacity-75 backdrop-blur-sm backdrop-filter">
+      <div className="absolute top-0 left-0 flex h-full w-full animate-show flex-col items-center justify-center rounded-[1vmin] bg-white bg-opacity-80">
         <span className="text-[8vmin] font-extrabold text-rose-600">
           Game over!
         </span>
