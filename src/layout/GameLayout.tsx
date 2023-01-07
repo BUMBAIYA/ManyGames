@@ -1,10 +1,15 @@
-import { Outlet } from "react-router-dom";
+import Footer from "./Footer";
+import Header from "./Header";
+import MainContent from "./MainContent";
 
 export default function GameLayout() {
   return (
-    <div>
-      {/* TODO: AppLayout, Navbar or Sidebar */}
-      <Outlet />
+    <div className="lg:ml-72 xl:ml-80">
+      <Header />
+      <div className="relative flex min-h-screen flex-col px-4 pt-14 sm:px-6 lg:px-8">
+        <MainContent />
+        <Footer />
+      </div>
     </div>
   );
 }
