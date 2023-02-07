@@ -2,64 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .board {
-    border-radius: 7px;
-    outline: none;
-    position: relative;
-  }
-  .board .cell,
-  .tile {
-    user-select: none;
-    cursor: default;
-  }
-  .cell,
-  .tile {
-    width: 15vmin;
-    height: 15vmin;
-    line-height: 90px;
-    display: inline-flex;
-    font-size: 6.5vmin;
-    font-weight: bold;
-    text-align: center;
-    vertical-align: middle;
-    border-radius: 1vmin;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-  }
-  .cell {
-    background-color: rgb(222, 219, 219);
-    margin: 0.6vmin;
-  }
-  .tile {
-    position: absolute;
-  }
-  .tile.merged {
-    display: none;
-  }
-  .tile.merged.isMoving {
-    display: inline-flex;
-  }
-  .tile.new {
-    animation-duration: 0.2s;
-    animation-name: newTile;
-    animation-fill-mode: forwards;
-    animation-delay: 0.15s;
-    transform: scale(0);
-  }
-  @keyframes newTile {
-    from {
-      transform: scale(0);
-    }
-    to {
-      transform: scale(1);
-    }
-  }
-}
-
 @layer base {
   body {
-    @apply m-0 box-border bg-white p-0 antialiased dark:bg-zinc-900;
+    @apply m-0 box-border bg-gray-100 p-0 antialiased dark:bg-zinc-900;
   }
 }

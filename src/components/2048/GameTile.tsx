@@ -4,12 +4,23 @@ type NewTileProps = {
   tile: GameTile;
 };
 
-const colors =
-  "bg-2 bg-4 bg-8 bg-16 bg-32 bg-64 bg-128 bg-256 bg-512 bg-1024 bg-2048";
+const colorss: any = {
+  2: "bg-emerald-200 text-emerald-800 dark:text-emerald-800",
+  4: "bg-emerald-300 text-emerald-800",
+  8: "bg-emerald-400 text-emerald-800",
+  16: "bg-emerald-500 text-emerald-100",
+  32: "bg-emerald-600 text-emerald-100",
+  64: "bg-emerald-700 text-emerald-300",
+  128: "bg-teal-400 text-teal-800",
+  256: "bg-teal-600 text-teal-200",
+  512: "bg-green-500 text-emerald-800",
+  1024: "bg-yellow-200 text-emerald-800",
+  2048: "bg-blue-600 text-white",
+};
 
 export default function NewTile({ tile }: NewTileProps) {
   let classArray: string[] = ["tile"];
-  classArray.push("bg-" + tile.value);
+  classArray.push(colorss[tile.value]);
   if (!tile.mergeToTile) classArray.push(`position_${tile.row}_${tile.column}`);
   else classArray.push("merged");
   if (tile.isNew()) classArray.push("new");

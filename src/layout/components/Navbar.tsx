@@ -5,6 +5,7 @@ import Searchbar from "./Searchbar";
 import SignIn from "./SignIn";
 import ThemeSwitchButton from "./ThemeSwitchButton";
 import Logo from "../../assets/icons/Logo";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -40,7 +41,7 @@ export default function Navbar() {
   return (
     <>
       <div
-        className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between gap-12 bg-white/[var(--bg-opacity-light)] px-4 backdrop-blur-sm transition dark:bg-zinc-900/[var(--bg-opacity-dark)] dark:backdrop-blur sm:px-6 lg:left-72 lg:z-30 lg:px-8 xl:left-80"
+        className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between gap-12 bg-white/[var(--bg-opacity-light)] px-4 backdrop-blur-sm transition dark:bg-zinc-900/[var(--bg-opacity-dark)] dark:backdrop-blur sm:px-6 lg:left-72 lg:z-30 lg:px-8"
         ref={navRef}
       >
         <div className="absolute inset-x-0 top-full h-px bg-zinc-900/10 transition dark:bg-white/10"></div>
@@ -58,9 +59,9 @@ export default function Navbar() {
               <Bars3Icon className="w-4 stroke-zinc-900 dark:stroke-white" />
             )}
           </button>
-          <a href="/" aria-label="Home">
+          <Link to="/" aria-label="Home">
             <Logo />
-          </a>
+          </Link>
         </div>
         <div className="flex items-center gap-5">
           <ThemeSwitchButton />

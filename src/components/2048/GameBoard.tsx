@@ -4,6 +4,7 @@ import useEvent from "../../hooks/useEvent";
 import GameTile from "./GameTile";
 import GameOverlay from "./GameOverlay";
 import GameDetails from "./GameDetails";
+import "../../styles/2048.css";
 import "../../styles/scss/2048.scss";
 
 type GameBoardProps = {
@@ -73,21 +74,17 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
   };
 
   return (
-    <div className="flex h-screen justify-center bg-gray-100">
-      <div>
-        <GameDetails score={board.score} resetGame={handleResetGame} />
-        <div>
-          <div className="board">
-            {cells}
-            {tiles}
-            <GameOverlay
-              onRestart={handleResetGame}
-              hasLost={board.hasLost()}
-              hasWon={board.hasWon()}
-            />
-          </div>
-        </div>
+    <div className="flex flex-row justify-center gap-6">
+      <div className="board">
+        {cells}
+        {tiles}
+        <GameOverlay
+          onRestart={handleResetGame}
+          hasLost={board.hasLost()}
+          hasWon={board.hasWon()}
+        />
       </div>
+      <GameDetails score={board.score} resetGame={handleResetGame} />
     </div>
   );
 }

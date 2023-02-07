@@ -40,7 +40,7 @@ export default function ThemeSwitchButton() {
         aria-label="Toggle dark mode"
       >
         <SunIcon className="h-4 w-4 stroke-zinc-900 dark:hidden" />
-        <MoonIcon className="hidden h-4 w-4 stroke-white dark:block" />
+        <MoonIcon className="hidden h-4 w-4 stroke-emerald-300 dark:block" />
       </button>
     </div>
   );
