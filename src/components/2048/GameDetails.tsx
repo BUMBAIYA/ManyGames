@@ -7,10 +7,10 @@ type GameDetailProps = {
 
 export default function GameDetails(props: GameDetailProps) {
   return (
-    <div className="flex flex-col flex-wrap gap-6 py-1">
-      <div className="rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20">
-        <div className="text-xs sm:text-base">SCORE</div>
-        <div className="text-base font-semibold sm:text-3xl">{props.score}</div>
+    <div className="flex w-full flex-row justify-between gap-6 px-2 py-1 md:w-max md:flex-col">
+      <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20">
+        <span className="text-xs sm:text-base">SCORE</span>
+        <p className="text-base font-semibold sm:text-3xl">{props.score}</p>
       </div>
       <div>
         <button
@@ -20,7 +20,7 @@ export default function GameDetails(props: GameDetailProps) {
           <span className="hidden text-lg font-semibold text-white dark:text-zinc-900 sm:block">
             New game
           </span>
-          <ArrowPathIcon className="block h-6 w-6 sm:hidden" />
+          <ArrowPathIcon className="block h-6 w-6 text-white dark:text-zinc-900 sm:hidden" />
         </button>
       </div>
     </div>

@@ -55,9 +55,14 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
 
   const cells = board.cells.map((row, rowIndex) => {
     return (
-      <div key={rowIndex}>
+      <div key={rowIndex} className="flex gap-1 sm:gap-2">
         {row.map((_, colIndex) => {
-          return <div className="cell" key={colIndex} />;
+          return (
+            <div
+              className="h-[76px] w-[76px] rounded-md border border-emerald-600 bg-gray-100 shadow-sm dark:border-emerald-800 dark:bg-zinc-900 sm:h-32 sm:w-32"
+              key={colIndex}
+            />
+          );
         })}
       </div>
     );
@@ -74,9 +79,9 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
   };
 
   return (
-    <div className="flex flex-row justify-center gap-6">
-      <div className="board">
-        {cells}
+    <div className="flex flex-col-reverse items-center gap-8 md:flex-row md:items-start">
+      <div className="relative">
+        <div className="flex flex-col gap-1 sm:gap-2">{cells}</div>
         {tiles}
         <GameOverlay
           onRestart={handleResetGame}

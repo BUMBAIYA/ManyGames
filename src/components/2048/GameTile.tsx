@@ -19,7 +19,9 @@ const colorss: any = {
 };
 
 export default function NewTile({ tile }: NewTileProps) {
-  let classArray: string[] = ["tile"];
+  let classArray: string[] = [
+    "tile inline-flex items-center justify-center font-bold w-[76px] h-[76px] rounded-md sm:w-32 sm:h-32 border border-emerald-600 dark:border-none text-3xl sm:text-5xl",
+  ];
   classArray.push(colorss[tile.value]);
   if (!tile.mergeToTile) classArray.push(`position_${tile.row}_${tile.column}`);
   else classArray.push("merged");

@@ -1,8 +1,16 @@
 @for $row from 0 through 3 {
   @for $column from 0 through 3 {
-    .position_#{$row}_#{$column}:not(.isMoving) {
-      top: $row * 16.2vmin + 0.6vmin;
-      left: $column * 16.2vmin + 0.6vmin;
+    @media (width < 640px) {
+      .position_#{$row}_#{$column}:not(.isMoving) {
+        top: $row * 5rem;
+        left: $column * 5rem;
+      }
+    }
+    @media (640px <= width) {
+      .position_#{$row}_#{$column}:not(.isMoving) {
+        top: $row * 8.5rem;
+        left: $column * 8.5rem;
+      }
     }
   }
 }
@@ -10,23 +18,47 @@
   @for $toRow from 0 through 3 {
     $name: row_from_#{$fromRow}_to_#{$toRow};
 
-    @if $fromRow == $toRow {
-      .#{$name} {
-        top: $toRow * 16.2vmin + 0.6vmin;
-      }
-    } @else {
-      .#{$name} {
-        animation-duration: 0.2s;
-        animation-name: $name;
-        animation-fill-mode: forwards;
-      }
-
-      @keyframes #{$name} {
-        from {
-          top: $fromRow * 16.2vmin + 0.6vmin;
+    @media (width < 640px) {
+      @if $fromRow == $toRow {
+        .#{$name} {
+          top: $toRow * 5rem;
         }
-        to {
-          top: $toRow * 16.2vmin + 0.6vmin;
+      } @else {
+        .#{$name} {
+          animation-duration: 0.2s;
+          animation-name: $name;
+          animation-fill-mode: forwards;
+        }
+
+        @keyframes #{$name} {
+          from {
+            top: $fromRow * 5rem;
+          }
+          to {
+            top: $toRow * 5rem;
+          }
+        }
+      }
+    }
+    @media (640px <= width) {
+      @if $fromRow == $toRow {
+        .#{$name} {
+          top: $toRow * 8.5rem;
+        }
+      } @else {
+        .#{$name} {
+          animation-duration: 0.2s;
+          animation-name: $name;
+          animation-fill-mode: forwards;
+        }
+
+        @keyframes #{$name} {
+          from {
+            top: $fromRow * 8.5rem;
+          }
+          to {
+            top: $toRow * 8.5rem;
+          }
         }
       }
     }
@@ -36,23 +68,47 @@
   @for $toColumn from 0 through 3 {
     $name: column_from_#{$fromColumn}_to_#{$toColumn};
 
-    @if $fromColumn == $toColumn {
-      .#{$name} {
-        left: $toColumn * 16.2vmin + 0.6vmin;
-      }
-    } @else {
-      .#{$name} {
-        animation-duration: 0.2s;
-        animation-name: $name;
-        animation-fill-mode: forwards;
-      }
-
-      @keyframes #{$name} {
-        from {
-          left: $fromColumn * 16.2vmin + 0.6vmin;
+    @media (width < 640px) {
+      @if $fromColumn == $toColumn {
+        .#{$name} {
+          left: $toColumn * 5rem;
         }
-        to {
-          left: $toColumn * 16.2vmin + 0.6vmin;
+      } @else {
+        .#{$name} {
+          animation-duration: 0.2s;
+          animation-name: $name;
+          animation-fill-mode: forwards;
+        }
+
+        @keyframes #{$name} {
+          from {
+            left: $fromColumn * 5rem;
+          }
+          to {
+            left: $toColumn * 5rem;
+          }
+        }
+      }
+    }
+    @media (640px <= width) {
+      @if $fromColumn == $toColumn {
+        .#{$name} {
+          left: $toColumn * 8.5rem;
+        }
+      } @else {
+        .#{$name} {
+          animation-duration: 0.2s;
+          animation-name: $name;
+          animation-fill-mode: forwards;
+        }
+
+        @keyframes #{$name} {
+          from {
+            left: $fromColumn * 8.5rem;
+          }
+          to {
+            left: $toColumn * 8.5rem;
+          }
         }
       }
     }
