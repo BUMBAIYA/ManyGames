@@ -11,7 +11,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [boardTileDimenstion, setBoardTileDimension] = useState({
-    col: 10,
+    col: 8,
     row: 5,
   });
   const [board, setBoard] = useState(

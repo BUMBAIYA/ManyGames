@@ -37,10 +37,12 @@ export default function Hero() {
         </h2>
         <div className="grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-4 dark:border-white/5 sm:grid-cols-2 xl:grid-cols-3">
           <GameCard
+            link="/2048"
             title="2048"
             description="Combine tiles to reach the total of 2048"
           />
           <GameCard
+            link="/puzzle"
             title="Puzzle"
             description="Solve the puzzle by shuffling tiles"
           />

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 type GameCardProps = {
   title: string;
   description: string;
+  link: string;
   logo?: JSX.Element;
 };
 
@@ -110,7 +111,7 @@ export default function GameCard(props: GameCardProps) {
         </div>
         <div className="flex flex-col">
           <h3 className="text-sm font-semibold leading-7 text-zinc-900 dark:text-white">
-            <Link to="/2048">
+            <Link to={props.link}>
               <span className="absolute inset-0 rounded-2xl"></span>
               {props.title}
             </Link>
