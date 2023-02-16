@@ -4,22 +4,20 @@ export class GameBoard {
   tiles: number[];
   emptyBoxIndex: number;
   won: boolean;
+  movesCount: number;
   constructor(_col: number, _row: number) {
     this.boardCol = _col;
     this.boardRow = _row;
+    this.movesCount = 0;
     this.won = false;
     this.tiles = [];
     for (let i = 0; i < _row * _col; i++) {
       this.tiles[i] = i;
     }
-    this.testShuffle();
-    this.emptyBoxIndex = this.tiles.findIndex((_tile) => _tile === 39);
-  }
-
-  testShuffle() {
-    var temp = this.tiles[38];
-    this.tiles[38] = this.tiles[39];
-    this.tiles[39] = temp;
+    this.shuffle();
+    this.emptyBoxIndex = this.tiles.findIndex(
+      (_tile) => _tile === _col * _row - 1
+    );
   }
 
   shuffle() {
@@ -69,6 +67,7 @@ export class GameBoard {
     this.tiles[this.emptyBoxIndex] = this.tiles[indexToBeSwaped];
     this.tiles[indexToBeSwaped] = tempTile;
     this.emptyBoxIndex = indexToBeSwaped;
+    this.movesCount++;
     this.checkWonCondition();
     return this;
   }
