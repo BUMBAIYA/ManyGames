@@ -41,8 +41,16 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
       ctx.drawImage(image, 0, 0);
 
       const tileCanvases = [];
-      for (let y = 0; y < canvas.height; y += splitHeight) {
-        for (let x = 0; x < canvas.width; x += splitWidth) {
+      for (
+        let y = 0;
+        y < splitHeight * boardTileDimenstion.row;
+        y += splitHeight
+      ) {
+        for (
+          let x = 0;
+          x < splitWidth * boardTileDimenstion.col;
+          x += splitWidth
+        ) {
           const tileCanvas = document.createElement("canvas");
           tileCanvas.width = splitWidth;
           tileCanvas.height = splitHeight;
@@ -169,7 +177,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
             </button>
 
             <button
-              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1  dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 "
+              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1  dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4"
               onClick={() => setOpenModal(true)}
             >
               <span className="text-base font-semibold text-white dark:text-zinc-900 lg:text-lg">
