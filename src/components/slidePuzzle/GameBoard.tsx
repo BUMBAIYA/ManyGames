@@ -2,6 +2,7 @@ import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import useEvent from "../../hooks/useEvent";
 import { classNames } from "../../utility/css";
+import GameWonLostModal from "../GameWonLostModal";
 import { GameBoard } from "./GameLogic";
 import { SlidePuzzleSettingModal } from "./SettingModal";
 
@@ -17,9 +18,10 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   const [board, setBoard] = useState(
     new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row)
   );
-  const [imageUrl, setImageUrl] = useState<string>("/puzzle/puzzle.jpg");
+  const [imageUrl, setImageUrl] = useState<string>("/assets/puzzle.jpg");
   const [imageTiles, setImageTiles] = useState<string[]>([]);
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
+  const [openWonModal, setOpenWonModal] = useState<boolean>(true);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -67,6 +69,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   }, [boardTileDimenstion]);
 
   const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.currentTarget !== document.activeElement) return;
     if (event.keyCode > 40 || event.keyCode < 37) return;
     event.preventDefault();
     if (event.repeat) return;
@@ -105,7 +108,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     }
   };
 
-  useEvent("keydown", handleKeyDown, false);
+  useEvent(document.body, "keydown", handleKeyDown, false);
 
   const handleResetGame = () => {
     setBoard(new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row));
@@ -116,18 +119,43 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     setBoardTileDimension({ col, row });
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleCloseSettingModal = () => {
+    setOpenSettingModal(false);
+  };
+
+  const handleCloseWonModal = () => {
+    setOpenWonModal(false);
+    handleResetGame();
+    setOpenWonModal(true);
+  };
+
+  const renderWonModal = () => {
+    if (board.hasWon()) {
+      return (
+        <GameWonLostModal
+          type="won"
+          isOpen={openWonModal}
+          closeModal={handleCloseWonModal}
+          stats={{
+            game: "slidePuzzle",
+            isLowestScore: true,
+            totalMoves: board.movesCount,
+            row: boardTileDimenstion.row,
+            col: boardTileDimenstion.col,
+          }}
+        />
+      );
+    } else null;
   };
 
   return (
     <div className="flex flex-col justify-center gap-10">
       <canvas ref={canvasRef} className="hidden"></canvas>
-      <div className="flex w-full flex-col-reverse justify-center gap-6 lg:flex-row">
+      <div className="flex w-full flex-col-reverse items-center justify-center gap-6 lg:flex-row lg:items-start">
         <div
           className={classNames(
             board.hasWon() ? "" : "gap-0.5 md:gap-1",
-            "grid w-full max-w-4xl rounded-md bg-zinc-900 p-1 dark:bg-emerald-800"
+            "grid w-full max-w-3xl rounded-md bg-zinc-900 p-1 dark:bg-emerald-800"
           )}
           style={{
             gridTemplateColumns: `repeat(${boardTileDimenstion.col}, minmax(0, 1fr))`,
@@ -158,7 +186,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
             );
           })}
         </div>
-        <div className="flex items-center justify-between gap-4 lg:flex-col">
+        <div className="flex w-full items-center justify-between gap-4 lg:w-auto lg:flex-col">
           <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 lg:w-full">
             <span className="text-xs sm:text-base">Moves</span>
             <p className="text-base font-semibold sm:text-3xl">
@@ -178,7 +206,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
 
             <button
               className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1  dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4"
-              onClick={() => setOpenModal(true)}
+              onClick={() => setOpenSettingModal(true)}
             >
               <span className="text-base font-semibold text-white dark:text-zinc-900 lg:text-lg">
                 Settings
@@ -187,9 +215,10 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
           </div>
         </div>
       </div>
+      {renderWonModal()}
       <SlidePuzzleSettingModal
-        isOpen={openModal}
-        closeModal={handleCloseModal}
+        isOpen={openSettingModal}
+        closeModal={handleCloseSettingModal}
         imageUrl={imageUrl}
         col={boardTileDimenstion.col}
         row={boardTileDimenstion.row}

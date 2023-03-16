@@ -1,6 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useRef, useState } from "react";
 import useAutosizeTextArea from "../../hooks/useAutosizeTextarea";
+import { verifyImageUrl } from "../../utility/image";
 
 export interface ISlidePuzzleSettingModalProps {
   isOpen: boolean;
@@ -12,21 +13,66 @@ export interface ISlidePuzzleSettingModalProps {
 }
 
 export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
+  const DEFAULT_IMG_URL = "/assets/puzzle.jpg";
+  const imageErrorP = useRef<HTMLParagraphElement>(null);
   const textareaImageUrl = useRef<HTMLTextAreaElement>(null);
-  const [imageurl, setImageurl] = useState<string>(props.imageUrl);
+  const [imageUrl, setImageUrl] = useState<string>(props.imageUrl);
+  const [verifiedImageUrl, setVerifiedImageUrl] = useState<string>(
+    props.imageUrl
+  );
   const [puzzleCol, setPuzzleCol] = useState<number>(props.col);
   const [puzzleRow, setPuzzleRow] = useState<number>(props.row);
-  useAutosizeTextArea(textareaImageUrl, imageurl);
+  const [showVerifyImage, setShowVerifyImage] = useState<boolean>(false);
+  useAutosizeTextArea(textareaImageUrl, imageUrl);
 
   const handleSave = () => {
-    if (imageurl === "") return;
-    props.submit(imageurl, puzzleCol, puzzleRow);
+    if (imageUrl === "") return;
+    if (
+      props.imageUrl === imageUrl &&
+      props.col === puzzleCol &&
+      props.row === puzzleRow
+    ) {
+      setShowVerifyImage(false);
+      props.closeModal();
+      return;
+    }
     props.closeModal();
+    setShowVerifyImage(false);
+    setImageUrl(verifiedImageUrl);
+    props.submit(verifiedImageUrl, puzzleCol, puzzleRow);
+  };
+
+  const handleVerifyImage = async () => {
+    const isValidUrl = await verifyImageUrl(imageUrl, DEFAULT_IMG_URL);
+    if (imageErrorP.current) {
+      if (!isValidUrl) {
+        imageErrorP.current.innerHTML =
+          "Incorrect Image Url default image loaded";
+        imageErrorP.current.style.color = "red";
+        setVerifiedImageUrl(DEFAULT_IMG_URL);
+        setShowVerifyImage(true);
+        return;
+      } else {
+        imageErrorP.current.innerHTML = "Image loaded successfully";
+        imageErrorP.current.style.color = "green";
+        setVerifiedImageUrl(imageUrl);
+        setShowVerifyImage(true);
+      }
+    }
+  };
+
+  const handleCloseModal = () => {
+    props.closeModal();
+    setPuzzleCol(props.col);
+    setPuzzleRow(props.row);
+    setImageUrl(props.imageUrl);
+    setVerifiedImageUrl(props.imageUrl);
+    setShowVerifyImage(false);
   };
 
   return (
     <Transition appear show={props.isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={props.closeModal}>
+      <Dialog as="div" className="relative z-10" onClose={handleCloseModal}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -59,12 +105,23 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
                 </Dialog.Title>
                 <div className="mt-4">
                   <p className="mb-1 text-sm text-gray-500">Image url</p>
-                  <textarea
-                    ref={textareaImageUrl}
-                    className="max-h-28 w-full rounded-lg placeholder:font-light dark:bg-zinc-800 dark:text-white dark:placeholder:text-slate-400 dark:hover:border"
-                    value={imageurl}
-                    onChange={(e) => setImageurl(e.target.value)}
-                  ></textarea>
+                  <div className="flex gap-2">
+                    <textarea
+                      ref={textareaImageUrl}
+                      className="max-h-28 w-full rounded-lg placeholder:font-light dark:bg-zinc-800 dark:text-white dark:placeholder:text-slate-400 dark:hover:border"
+                      value={imageUrl}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        setImageUrl(e.target.value);
+                      }}
+                    ></textarea>
+                    <button
+                      className="h-fit rounded-md border border-transparent bg-emerald-400 px-3 py-2 text-emerald-900 hover:bg-emerald-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 sm:px-4 sm:py-2"
+                      onClick={handleVerifyImage}
+                    >
+                      Verify
+                    </button>
+                  </div>
                 </div>
                 <div className="mt-4">
                   <p className="text-sm text-gray-500">
@@ -94,16 +151,16 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
                 </div>
 
                 <div className="mt-4">
-                  <p className="text-sm text-gray-500">Preview</p>
-                  <img
-                    src={imageurl}
-                    alt="puzzle image"
-                    className="mt-1 w-full rounded-md bg-cover"
-                    onError={({ currentTarget }) => {
-                      currentTarget.onerror = null;
-                      currentTarget.src = `/puzzle/puzzle.jpg`;
-                    }}
-                  />
+                  <p className="mt-2 text-sm" ref={imageErrorP}></p>
+                  {showVerifyImage && (
+                    <>
+                      <img
+                        src={verifiedImageUrl}
+                        alt="puzzle image"
+                        className="mt-1 w-full rounded-md bg-cover"
+                      />
+                    </>
+                  )}
                 </div>
 
                 <div className="mt-4 flex justify-end gap-2">
@@ -117,7 +174,7 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
                   <button
                     type="button"
                     className="rounded-md bg-zinc-900 px-2 py-1 text-white shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-zinc-800 dark:ring-1 dark:ring-inset dark:ring-white dark:hover:bg-zinc-800 dark:hover:ring-emerald-400 sm:px-4 sm:py-2"
-                    onClick={props.closeModal}
+                    onClick={handleCloseModal}
                   >
                     Close
                   </button>
