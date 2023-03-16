@@ -4,7 +4,6 @@ import useEvent from "../../hooks/useEvent";
 import GameTile from "./GameTile";
 import GameOverlay from "./GameOverlay";
 import GameDetails from "./GameDetails";
-import "../../styles/2048.css";
 import "../../styles/scss/2048.scss";
 
 type GameBoardProps = {
@@ -15,6 +14,7 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
   const [board, setBoard] = useState(new Board(size));
 
   const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.currentTarget !== document.activeElement) return;
     if (event.keyCode > 40 || event.keyCode < 37) return;
     event.preventDefault();
     if (event.repeat) return;
@@ -51,7 +51,7 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
     }
   };
 
-  useEvent("keydown", handleKeyDown, false);
+  useEvent(document.body, "keydown", handleKeyDown, false);
 
   const cells = board.cells.map((row, rowIndex) => {
     return (
@@ -79,7 +79,7 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
   };
 
   return (
-    <div className="flex flex-col-reverse items-center gap-8 md:flex-row md:items-start">
+    <div className="flex flex-col-reverse items-center gap-8 md:flex-row md:items-start md:justify-center">
       <div className="relative">
         <div className="flex flex-col gap-1 sm:gap-2">{cells}</div>
         {tiles}
