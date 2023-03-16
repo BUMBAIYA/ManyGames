@@ -1,11 +1,11 @@
 export function verifyImageUrl(
   url: string,
   defaultUrl: string
-): Promise<string> {
+): Promise<boolean> {
   return new Promise((resolve) => {
     const img = new Image();
-    img.onload = () => resolve(url);
-    img.onerror = () => resolve(defaultUrl);
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
     img.src = url;
   });
 }
