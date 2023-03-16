@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Board } from "./GameLogic";
 import useEvent from "../../hooks/useEvent";
 import GameTile from "./GameTile";
-import GameOverlay from "./GameOverlay";
 import GameDetails from "./GameDetails";
 import "../../styles/scss/2048.scss";
+import GameWonLostModal from "../GameWonLostModal";
 
 type GameBoardProps = {
   size?: number;
@@ -12,6 +12,7 @@ type GameBoardProps = {
 
 export default function GameBoard({ size = 4 }: GameBoardProps) {
   const [board, setBoard] = useState(new Board(size));
+  const [openWonModal, setOpenWonModal] = useState<boolean>(true);
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.currentTarget !== document.activeElement) return;
@@ -78,18 +79,50 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
     setBoard(new Board(size));
   };
 
+  const handleCloseWonModal = () => {
+    setOpenWonModal(false);
+    handleResetGame();
+    setOpenWonModal(true);
+  };
+
+  const renderWonModal = () => {
+    if (board.hasWon()) {
+      return (
+        <GameWonLostModal
+          type="won"
+          isOpen={openWonModal}
+          closeModal={handleCloseWonModal}
+          stats={{
+            game: "2048",
+            isHighScore: true,
+            score: board.score,
+          }}
+        />
+      );
+    } else if (board.hasLost()) {
+      return (
+        <GameWonLostModal
+          type="lost"
+          isOpen={openWonModal}
+          closeModal={handleCloseWonModal}
+          stats={{
+            game: "2048",
+            isHighScore: true,
+            score: board.score,
+          }}
+        />
+      );
+    } else null;
+  };
+
   return (
     <div className="flex flex-col-reverse items-center gap-8 md:flex-row md:items-start md:justify-center">
       <div className="relative">
         <div className="flex flex-col gap-1 sm:gap-2">{cells}</div>
         {tiles}
-        <GameOverlay
-          onRestart={handleResetGame}
-          hasLost={board.hasLost()}
-          hasWon={board.hasWon()}
-        />
       </div>
       <GameDetails score={board.score} resetGame={handleResetGame} />
+      {renderWonModal()}
     </div>
   );
 }
