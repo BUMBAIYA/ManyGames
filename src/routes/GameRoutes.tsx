@@ -1,9 +1,26 @@
+import { lazy, Suspense } from "react";
 import { RouteObject } from "react-router-dom";
-import GameBoard from "../components/2048/GameBoard";
-import SlidePuzzleBoard from "../components/slidePuzzle/GameBoard";
+import LoadingGame from "../layout/LoadingGame";
 import ErrorPage from "../layout/ErrorPage";
 import GameLayout from "../layout/GameLayout";
 import Hero from "../layout/Hero";
+import GameError from "../layout/GameError";
+
+const GameBoard = lazy(() => import("../components/2048/GameBoard"));
+const SlidePuzzleBoard = lazy(
+  () => import("../components/slidePuzzle/GameBoard")
+);
+const GameBoardWithFallback = () => (
+  <Suspense fallback={<LoadingGame />}>
+    <GameBoard />
+  </Suspense>
+);
+
+const SlidePuzzleBoardWithFallback = () => (
+  <Suspense fallback={<LoadingGame />}>
+    <SlidePuzzleBoard />
+  </Suspense>
+);
 
 export const GameRoutes: RouteObject = {
   path: "/",
@@ -11,16 +28,16 @@ export const GameRoutes: RouteObject = {
   errorElement: <ErrorPage />,
   children: [
     {
-      errorElement: <ErrorPage />,
+      errorElement: <GameError />,
       children: [
         { index: true, element: <Hero /> },
         {
           path: "/2048",
-          element: <GameBoard />,
+          element: <GameBoardWithFallback />,
         },
         {
           path: "/puzzle",
-          element: <SlidePuzzleBoard />,
+          element: <SlidePuzzleBoardWithFallback />,
         },
       ],
     },
