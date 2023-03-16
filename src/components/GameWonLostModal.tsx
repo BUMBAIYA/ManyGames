@@ -98,7 +98,7 @@ export default function GameWonLostModal(props: IGameWonLostModalProps) {
                     onClick={() => props.closeModal()}
                     className="outline-none"
                   >
-                    <XMarkIcon className="h-5 w-5 text-white" />
+                    <XMarkIcon className="h-5 w-5 text-zinc-900 dark:text-white" />
                   </button>
                 </div>
                 {renderStats()}

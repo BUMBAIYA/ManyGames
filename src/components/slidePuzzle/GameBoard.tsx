@@ -1,9 +1,10 @@
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import useEvent from "../../hooks/useEvent";
 import { classNames } from "../../utility/css";
 import GameWonLostModal from "../GameWonLostModal";
 import { GameBoard } from "./GameLogic";
+import PreviewModal from "./PreviewModal";
 import { SlidePuzzleSettingModal } from "./SettingModal";
 
 export interface IPuzzleProps {}
@@ -21,6 +22,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   const [imageUrl, setImageUrl] = useState<string>("/assets/puzzle.jpg");
   const [imageTiles, setImageTiles] = useState<string[]>([]);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
+  const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
   const [openWonModal, setOpenWonModal] = useState<boolean>(true);
 
   useEffect(() => {
@@ -193,9 +195,19 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
               {board.movesCount}
             </p>
           </div>
-          <div className="flex items-center gap-4 lg:flex-col">
+          <div className="flex items-center gap-2 lg:flex-col">
             <button
-              className="rounded-md bg-zinc-900  p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset  dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full "
+              className="w-full rounded-md bg-emerald-400/10 p-2 text-base font-semibold ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 sm:px-4 lg:text-lg"
+              onClick={() => setOpenPreviewModal(true)}
+            >
+              <span className="hidden text-base font-semibold text-emerald-600 dark:text-emerald-300 sm:block lg:text-lg">
+                Preview
+              </span>
+              <EyeIcon className="block h-6 w-6 stroke-emerald-600 dark:stroke-emerald-400 sm:hidden" />
+            </button>
+
+            <button
+              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset  dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full "
               onClick={handleResetGame}
             >
               <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
@@ -223,6 +235,11 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
         col={boardTileDimenstion.col}
         row={boardTileDimenstion.row}
         submit={handleUpatePuzzle}
+      />
+      <PreviewModal
+        isOpen={openPreviewModal}
+        closeModal={() => setOpenPreviewModal(false)}
+        imageUrl={imageUrl}
       />
     </div>
   );
