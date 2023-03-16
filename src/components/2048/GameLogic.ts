@@ -175,7 +175,9 @@ export class Board {
           this.score += tile1.value + tile2.value;
         }
         resultRow[targetIndex] = targetTile;
-        this.won = targetTile.value === 2048;
+        if (targetTile.value === 2048) {
+          this.won = true;
+        }
         hasChanged =
           targetTile.value !== this.cells[rowIndex][targetIndex].value ||
           hasChanged;
