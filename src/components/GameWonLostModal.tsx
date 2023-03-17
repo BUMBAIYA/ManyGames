@@ -72,7 +72,7 @@ export default function GameWonLostModal(props: IGameWonLostModalProps) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 top-14 bg-zinc-900 bg-opacity-10 dark:bg-zinc-700 dark:bg-opacity-70" />
+          <div className="fixed inset-0 top-14 bg-zinc-900 bg-opacity-50 dark:bg-zinc-700 dark:bg-opacity-70" />
         </Transition.Child>
 
         <div className="fixed inset-0 top-12 overflow-y-auto">
