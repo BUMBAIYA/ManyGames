@@ -21,13 +21,30 @@ export class GameBoard {
   }
 
   shuffle() {
-    var currentLen = this.tiles.length;
-    while (currentLen !== 0) {
-      var randomIndex = Math.floor(Math.random() * currentLen);
-      --currentLen;
-      var tempTile = this.tiles[currentLen];
-      this.tiles[currentLen] = this.tiles[randomIndex];
-      this.tiles[randomIndex] = tempTile;
+    let currentLen = this.boardCol * this.boardRow;
+    for (let i = currentLen - 1; i > 0; i--) {
+      const randomIndex = Math.floor(Math.random() * (i + 1));
+      [this.tiles[i], this.tiles[randomIndex]] = [
+        this.tiles[randomIndex],
+        this.tiles[i],
+      ];
+    }
+    this.checkSolvable();
+  }
+
+  checkSolvable() {
+    let currentLen = this.boardCol * this.boardRow;
+    let inversions = 0;
+    for (let i = 0; i < currentLen; i++) {
+      for (let j = i + 1; j < currentLen; j++) {
+        if (this.tiles[i] > this.tiles[j] && this.tiles[j] !== 0) {
+          inversions++;
+        }
+      }
+    }
+    const isSolvable = inversions % 2 === 0;
+    if (!isSolvable) {
+      this.shuffle();
     }
   }
 
