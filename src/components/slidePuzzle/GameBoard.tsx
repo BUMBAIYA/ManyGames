@@ -28,6 +28,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   const [loadingBoard, setLoadingBoard] = useState<boolean>(true);
 
   useEffect(() => {
+    setLoadingBoard(true);
     let valid = false;
     async function verifyImage() {
       valid = await verifyImageUrl(imageUrl);
