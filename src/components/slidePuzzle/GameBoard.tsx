@@ -2,7 +2,7 @@ import { ArrowPathIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import useEvent from "../../hooks/useEvent";
 import { classNames } from "../../utility/css";
-import { verifyImageUrl } from "../../utility/image";
+import { splitImageToTiles, verifyImageUrl } from "../../utility/image";
 import GameWonLostModal from "../GameWonLostModal";
 import { GameBoard } from "./GameLogic";
 import PreviewModal from "./PreviewModal";
@@ -33,46 +33,15 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     async function verifyImage() {
       valid = await verifyImageUrl(imageUrl);
       if (valid) {
-        const canvas = canvasRef.current!;
-        const ctx = canvas?.getContext("2d")!;
-
-        const image = new Image();
-        image.setAttribute("crossOrigin", "anonymous");
-        image.src = imageUrl;
-        image.onload = () => {
-          var imagewidth = image.width;
-          var imageHeight = image.height;
-
-          canvas.width = imagewidth;
-          canvas.height = imageHeight;
-
-          var splitHeight = Math.floor(imageHeight / boardTileDimenstion.row);
-          var splitWidth = Math.floor(imagewidth / boardTileDimenstion.col);
-
-          ctx.drawImage(image, 0, 0);
-
-          const tileCanvases = [];
-          for (
-            let y = 0;
-            y < splitHeight * boardTileDimenstion.row;
-            y += splitHeight
-          ) {
-            for (
-              let x = 0;
-              x < splitWidth * boardTileDimenstion.col;
-              x += splitWidth
-            ) {
-              const tileCanvas = document.createElement("canvas");
-              tileCanvas.width = splitWidth;
-              tileCanvas.height = splitHeight;
-              tileCanvas.getContext("2d")!.drawImage(canvas, -x, -y);
-              tileCanvases.push(tileCanvas.toDataURL());
-            }
-          }
-          setImageTiles(tileCanvases);
-          setLoadingBoard(!valid);
-        };
+        const tileImages = await splitImageToTiles(
+          imageUrl,
+          canvasRef,
+          boardTileDimenstion.row,
+          boardTileDimenstion.col
+        );
+        setImageTiles(tileImages);
       }
+      setLoadingBoard(!valid);
     }
     verifyImage();
   }, [imageUrl, boardTileDimenstion]);
