@@ -43,7 +43,7 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
   };
 
   const handleVerifyImage = async () => {
-    const isValidUrl = await verifyImageUrl(imageUrl, DEFAULT_IMG_URL);
+    const isValidUrl = await verifyImageUrl(imageUrl);
     if (imageErrorP.current) {
       if (!isValidUrl) {
         imageErrorP.current.innerHTML =

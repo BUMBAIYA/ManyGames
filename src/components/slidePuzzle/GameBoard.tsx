@@ -2,6 +2,7 @@ import { ArrowPathIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import useEvent from "../../hooks/useEvent";
 import { classNames } from "../../utility/css";
+import { verifyImageUrl } from "../../utility/image";
 import GameWonLostModal from "../GameWonLostModal";
 import { GameBoard } from "./GameLogic";
 import PreviewModal from "./PreviewModal";
@@ -24,46 +25,55 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
   const [openWonModal, setOpenWonModal] = useState<boolean>(true);
+  const [loadingBoard, setLoadingBoard] = useState<boolean>(true);
 
   useEffect(() => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas?.getContext("2d")!;
+    let valid = false;
+    async function verifyImage() {
+      valid = await verifyImageUrl(imageUrl);
+      if (valid) {
+        const canvas = canvasRef.current!;
+        const ctx = canvas?.getContext("2d")!;
 
-    const image = new Image();
-    image.setAttribute("crossOrigin", "anonymous");
-    image.src = imageUrl;
-    image.onload = () => {
-      var imagewidth = image.width;
-      var imageHeight = image.height;
+        const image = new Image();
+        image.setAttribute("crossOrigin", "anonymous");
+        image.src = imageUrl;
+        image.onload = () => {
+          var imagewidth = image.width;
+          var imageHeight = image.height;
 
-      canvas.width = imagewidth;
-      canvas.height = imageHeight;
+          canvas.width = imagewidth;
+          canvas.height = imageHeight;
 
-      var splitHeight = Math.floor(imageHeight / boardTileDimenstion.row);
-      var splitWidth = Math.floor(imagewidth / boardTileDimenstion.col);
+          var splitHeight = Math.floor(imageHeight / boardTileDimenstion.row);
+          var splitWidth = Math.floor(imagewidth / boardTileDimenstion.col);
 
-      ctx.drawImage(image, 0, 0);
+          ctx.drawImage(image, 0, 0);
 
-      const tileCanvases = [];
-      for (
-        let y = 0;
-        y < splitHeight * boardTileDimenstion.row;
-        y += splitHeight
-      ) {
-        for (
-          let x = 0;
-          x < splitWidth * boardTileDimenstion.col;
-          x += splitWidth
-        ) {
-          const tileCanvas = document.createElement("canvas");
-          tileCanvas.width = splitWidth;
-          tileCanvas.height = splitHeight;
-          tileCanvas.getContext("2d")!.drawImage(canvas, -x, -y);
-          tileCanvases.push(tileCanvas.toDataURL());
-        }
+          const tileCanvases = [];
+          for (
+            let y = 0;
+            y < splitHeight * boardTileDimenstion.row;
+            y += splitHeight
+          ) {
+            for (
+              let x = 0;
+              x < splitWidth * boardTileDimenstion.col;
+              x += splitWidth
+            ) {
+              const tileCanvas = document.createElement("canvas");
+              tileCanvas.width = splitWidth;
+              tileCanvas.height = splitHeight;
+              tileCanvas.getContext("2d")!.drawImage(canvas, -x, -y);
+              tileCanvases.push(tileCanvas.toDataURL());
+            }
+          }
+          setImageTiles(tileCanvases);
+          setLoadingBoard(!valid);
+        };
       }
-      setImageTiles(tileCanvases);
-    };
+    }
+    verifyImage();
   }, [imageUrl, boardTileDimenstion]);
 
   useEffect(() => {
@@ -132,7 +142,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   };
 
   const renderWonModal = () => {
-    if (board.hasWon()) {
+    if (board.won) {
       return (
         <GameWonLostModal
           type="won"
@@ -154,40 +164,49 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     <div className="flex flex-col justify-center gap-10">
       <canvas ref={canvasRef} className="hidden"></canvas>
       <div className="flex w-full flex-col-reverse items-center justify-center gap-6 lg:flex-row lg:items-start">
-        <div
-          className={classNames(
-            board.hasWon() ? "" : "gap-0.5 md:gap-1",
-            "grid w-full max-w-3xl rounded-md bg-zinc-900 p-1 dark:bg-emerald-800"
-          )}
-          style={{
-            gridTemplateColumns: `repeat(${boardTileDimenstion.col}, minmax(0, 1fr))`,
-            gridTemplateRows: `repeat(${boardTileDimenstion.row}, minmax(0, 1fr))`,
-          }}
-        >
-          {board.tiles.map((_tile, index) => {
-            if (
-              _tile ===
-              boardTileDimenstion.col * boardTileDimenstion.row - 1
-            ) {
+        {loadingBoard && (
+          <div className="flex w-full max-w-3xl items-center justify-center gap-2 text-zinc-900 dark:text-emerald-400">
+            <ArrowPathIcon className="h-6 w-6 animate-spin stroke-zinc-900 dark:stroke-emerald-400" />
+            <h1 className="text-2xl">Building board...</h1>
+          </div>
+        )}
+        {!loadingBoard && (
+          <div
+            className={classNames(
+              board.hasWon() ? "" : "gap-0.5 md:gap-1",
+              "grid w-full max-w-3xl rounded-md bg-zinc-900 p-1 dark:bg-emerald-800"
+            )}
+            style={{
+              gridTemplateColumns: `repeat(${boardTileDimenstion.col}, minmax(0, 1fr))`,
+              gridTemplateRows: `repeat(${boardTileDimenstion.row}, minmax(0, 1fr))`,
+            }}
+          >
+            {board.tiles.map((_tile, index) => {
+              if (
+                _tile ===
+                  boardTileDimenstion.col * boardTileDimenstion.row - 1 &&
+                !board.won
+              ) {
+                return (
+                  <div
+                    key={index}
+                    className="h-full w-full rounded-sm bg-white text-black dark:bg-zinc-900"
+                  ></div>
+                );
+              }
               return (
-                <div
+                <img
+                  src={imageTiles[_tile]}
                   key={index}
-                  className="h-full w-full rounded-sm bg-white text-black dark:bg-zinc-900"
-                ></div>
+                  className={classNames(
+                    board.hasWon() ? "" : "rounded-sm",
+                    "h-full w-full bg-cover bg-no-repeat"
+                  )}
+                ></img>
               );
-            }
-            return (
-              <img
-                src={imageTiles[_tile]}
-                key={index}
-                className={classNames(
-                  board.hasWon() ? "" : "rounded-sm",
-                  "h-full w-full bg-cover bg-no-repeat"
-                )}
-              ></img>
-            );
-          })}
-        </div>
+            })}
+          </div>
+        )}
         <div className="flex w-full items-center justify-between gap-4 lg:w-auto lg:flex-col">
           <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 lg:w-full">
             <span className="text-xs sm:text-base">Moves</span>
