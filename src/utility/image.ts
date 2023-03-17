@@ -1,7 +1,4 @@
-export function verifyImageUrl(
-  url: string,
-  defaultUrl: string
-): Promise<boolean> {
+export function verifyImageUrl(url: string): Promise<boolean> {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve(true);
