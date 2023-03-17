@@ -29,7 +29,7 @@ export default function PreviewModal(props: IPreviewModalProps) {
         </Transition.Child>
 
         <div className="fixed inset-0 top-12 overflow-y-auto">
-          <div className="flex min-h-full p-4 text-center">
+          <div className="flex min-h-full justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
