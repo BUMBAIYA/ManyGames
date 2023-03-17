@@ -37,7 +37,7 @@ export class GameBoard {
     let inversions = 0;
     for (let i = 0; i < currentLen; i++) {
       for (let j = i + 1; j < currentLen; j++) {
-        if (this.tiles[i] > this.tiles[j] && this.tiles[j] !== 0) {
+        if (this.tiles[i] < this.tiles[j] && this.tiles[j] !== currentLen - 1) {
           inversions++;
         }
       }
