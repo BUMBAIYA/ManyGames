@@ -2,10 +2,10 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { Transition, Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Searchbar from "./Searchbar";
-import SignIn from "./SignIn";
 import ThemeSwitchButton from "./ThemeSwitchButton";
 import Logo from "../../assets/icons/Logo";
 import { Link } from "react-router-dom";
+import { SidebarNavLink } from "./SidebarNavLink";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -65,7 +65,6 @@ export default function Navbar() {
         </div>
         <div className="flex items-center gap-5">
           <ThemeSwitchButton />
-          <SignIn />
         </div>
       </div>
       <Transition.Root show={open} as={Fragment}>
@@ -96,16 +95,11 @@ export default function Navbar() {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <div className="fixed left-0 top-14 bottom-0 w-full translate-x-0 overflow-y-auto bg-white px-4 pt-6 pb-4 shadow-lg shadow-zinc-900/10 ring-1 ring-zinc-900/10 dark:bg-zinc-900 dark:ring-zinc-800 min-[416px]:max-w-sm sm:px-6 sm:pb-10">
+              <div className="fixed left-0 top-14 bottom-0 flex w-full translate-x-0 flex-col overflow-y-auto bg-white px-4 pt-6 pb-4 shadow-lg shadow-zinc-900/10 ring-1 ring-zinc-900/10 dark:bg-zinc-900 dark:ring-zinc-800 min-[416px]:max-w-sm sm:px-6 sm:pb-10">
                 <nav>
-                  <li className="sticky bottom-0 z-10 mt-6 list-none min-[416px]:hidden">
-                    <a
-                      className="inline-flex w-full justify-center gap-0.5 overflow-hidden rounded-md bg-zinc-900 py-1 px-3 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-400"
-                      href="/sdks#"
-                    >
-                      Sign in
-                    </a>
-                  </li>
+                  <ul role="list">
+                    <SidebarNavLink closeModal={() => setOpen(false)} />
+                  </ul>
                 </nav>
               </div>
             </Transition.Child>

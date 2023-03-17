@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Logo from "../assets/icons/Logo";
 import Navbar from "./components/Navbar";
+import { SidebarNavLink } from "./components/SidebarNavLink";
 
 export default function Header() {
   return (
@@ -11,6 +12,11 @@ export default function Header() {
             <Logo />
           </Link>
         </div>
+        <nav className="hidden lg:mt-10 lg:block">
+          <ul role="list">
+            <SidebarNavLink />
+          </ul>
+        </nav>
         <Navbar />
       </div>
     </header>
