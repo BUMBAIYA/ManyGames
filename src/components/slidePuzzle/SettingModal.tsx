@@ -1,6 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useRef, useState } from "react";
 import useAutosizeTextArea from "../../hooks/useAutosizeTextarea";
+import { classNames } from "../../utility/css";
 import { verifyImageUrl } from "../../utility/image";
 
 export interface ISlidePuzzleSettingModalProps {
@@ -103,6 +104,34 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
                 >
                   Puzzle settings
                 </Dialog.Title>
+
+                <div className="mt-4">
+                  <p className="text-sm text-gray-500">
+                    No. of columns: {puzzleCol}
+                  </p>
+                  <input
+                    type="range"
+                    min={3}
+                    max={10}
+                    value={puzzleCol}
+                    onChange={(e) => setPuzzleCol(parseInt(e.target.value))}
+                    className="accent-emerald-500"
+                  />
+                </div>
+
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500">
+                    No. of rows: {puzzleRow}
+                  </p>
+                  <input
+                    type="range"
+                    min={3}
+                    max={10}
+                    value={puzzleRow}
+                    onChange={(e) => setPuzzleRow(parseInt(e.target.value))}
+                    className="accent-emerald-500"
+                  />
+                </div>
                 <div className="mt-4">
                   <p className="mb-1 text-sm text-gray-500">Image url</p>
                   <div className="flex gap-2">
@@ -124,33 +153,6 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <p className="text-sm text-gray-500">
-                    No. of columns: {puzzleCol}
-                  </p>
-                  <input
-                    type="range"
-                    min={3}
-                    max={10}
-                    value={puzzleCol}
-                    onChange={(e) => setPuzzleCol(parseInt(e.target.value))}
-                    className="accent-emerald-500"
-                  />
-                </div>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">
-                    No. of rows: {puzzleRow}
-                  </p>
-                  <input
-                    type="range"
-                    min={3}
-                    max={10}
-                    value={puzzleRow}
-                    onChange={(e) => setPuzzleRow(parseInt(e.target.value))}
-                    className="accent-emerald-500"
-                  />
-                </div>
-
-                <div className="mt-4">
                   <p className="mt-2 text-sm" ref={imageErrorP}></p>
                   {showVerifyImage && (
                     <>
@@ -163,7 +165,12 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
                   )}
                 </div>
 
-                <div className="mt-4 flex justify-end gap-2">
+                <div
+                  className={classNames(
+                    showVerifyImage ? "mt-4" : "mt-12",
+                    "flex justify-end gap-2"
+                  )}
+                >
                   <button
                     type="button"
                     className="rounded-md border border-transparent bg-emerald-400 px-3 py-2 text-emerald-900 hover:bg-emerald-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 sm:px-4 sm:py-2"

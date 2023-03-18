@@ -1,4 +1,8 @@
-import { ArrowPathIcon, EyeIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathIcon,
+  EyeIcon,
+  EyeSlashIcon,
+} from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import useEvent from "../../hooks/useEvent";
 import { classNames } from "../../utility/css";
@@ -144,7 +148,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
           <div
             className={classNames(
               board.hasWon() ? "" : "gap-0.5 md:gap-1",
-              "grid w-full max-w-3xl rounded-md bg-zinc-900 p-1 dark:bg-emerald-800"
+              "grid w-full max-w-3xl select-none rounded-md bg-zinc-900 p-1 dark:bg-emerald-800"
             )}
             style={{
               gridTemplateColumns: `repeat(${boardTileDimenstion.col}, minmax(0, 1fr))`,
@@ -187,12 +191,16 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
           <div className="flex items-center gap-2 lg:flex-col">
             <button
               className="w-full rounded-md bg-emerald-400/10 p-2 text-base font-semibold ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 sm:px-4 lg:text-lg"
-              onClick={() => setOpenPreviewModal(true)}
+              onClick={() => setOpenPreviewModal((prev) => !prev)}
             >
               <span className="hidden text-base font-semibold text-emerald-600 dark:text-emerald-300 sm:block lg:text-lg">
-                Preview
+                {openPreviewModal ? "Hide" : "Preview"}
               </span>
-              <EyeIcon className="block h-6 w-6 stroke-emerald-600 dark:stroke-emerald-400 sm:hidden" />
+              {openPreviewModal ? (
+                <EyeSlashIcon className="block h-6 w-6 stroke-emerald-600 dark:stroke-emerald-400 sm:hidden" />
+              ) : (
+                <EyeIcon className="block h-6 w-6 stroke-emerald-600 dark:stroke-emerald-400 sm:hidden" />
+              )}
             </button>
 
             <button

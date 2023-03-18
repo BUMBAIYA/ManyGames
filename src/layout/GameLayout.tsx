@@ -6,7 +6,7 @@ export default function GameLayout() {
   return (
     <div className="lg:ml-72">
       <Header />
-      <div className="relative flex min-h-screen flex-col px-4 pt-14 sm:px-6 lg:px-8">
+      <div className="flex min-h-screen flex-col px-4 pt-14 sm:px-6 lg:px-8">
         <MainContent />
         <Footer />
       </div>
