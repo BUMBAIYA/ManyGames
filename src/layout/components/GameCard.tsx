@@ -1,126 +1,71 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
-type GameCardProps = {
+export type GameCardPropsType = {
   title: string;
-  description: string;
   link: string;
-  logo?: JSX.Element;
+  description: string;
+  imageUrl: string;
 };
 
-export default function GameCard(props: GameCardProps) {
-  const refGradientMask = useRef<HTMLDivElement>(null);
-  const refSVGMask = useRef<HTMLDivElement>(null);
-  function handleHoverAnimation(e: any) {
-    var card = e.target.getBoundingClientRect();
-    var x = e.clientX - card.left;
-    var y = Math.floor(e.clientY - card.top);
-    if (refGradientMask.current !== null && refSVGMask.current !== null) {
-      refGradientMask.current.style.maskImage = `radial-gradient(150px at ${x}px ${y}px, white, transparent)`;
-      refSVGMask.current.style.maskImage = `radial-gradient(150px at ${x}px ${y}px, white, transparent)`;
+export default function GameCard(props: GameCardPropsType) {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (imgRef.current) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setIsVisible(true);
+              observer.unobserve(imgRef.current!);
+            }
+          });
+        },
+        { rootMargin: "50px" }
+      );
+      observer.observe(imgRef.current);
+      return () => {
+        if (imgRef.current === null) return;
+        observer.unobserve(imgRef.current!);
+      };
     }
-  }
+  }, [props.imageUrl]);
+
+  const handleImageLoad = () => {
+    setIsLoading(false);
+  };
+
   return (
-    <div
-      className="group relative flex rounded-2xl bg-zinc-50 transition-shadow hover:shadow-md hover:shadow-zinc-900/5 dark:bg-white/5 dark:hover:shadow-black/5"
-      onMouseMoveCapture={(e) => handleHoverAnimation(e)}
+    <Link
+      to={props.link}
+      className="flex flex-col overflow-hidden rounded-xl border border-gray-300 bg-white transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800"
     >
-      <div className="pointer-events-none">
-        <div className="absolute inset-0 rounded-2xl transition duration-300 [mask-image:linear-gradient(white,transparent)] group-hover:opacity-50">
-          <svg
-            aria-hidden="true"
-            className="dark:fill-white/1 dark:stroke-white/2.5 absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/[0.02] stroke-black/5"
-          >
-            <defs>
-              <pattern
-                id=":R56hd6:"
-                width="72"
-                height="56"
-                patternUnits="userSpaceOnUse"
-                x="50%"
-                y="16"
-              >
-                <path d="M.5 56V.5H72" fill="none"></path>
-              </pattern>
-            </defs>
-            <rect
-              width="100%"
-              height="100%"
-              strokeWidth="0"
-              fill="url(#:R56hd6:)"
-            ></rect>
-            <svg x="50%" y="16" className="overflow-visible">
-              <rect strokeWidth="0" width="73" height="57" x="0" y="56"></rect>
-              <rect
-                strokeWidth="0"
-                width="73"
-                height="57"
-                x="72"
-                y="168"
-              ></rect>
-            </svg>
-          </svg>
-        </div>
-        <div
-          className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#D7EDEA] to-[#F4FBDF] opacity-0 transition duration-300 group-hover:opacity-100 dark:from-[#202D2E] dark:to-[#303428]"
-          ref={refGradientMask}
-        ></div>
-        <div
-          className="absolute inset-0 rounded-2xl opacity-0 mix-blend-overlay transition duration-300 group-hover:opacity-100"
-          ref={refSVGMask}
-        >
-          <svg
-            aria-hidden="true"
-            className="dark:fill-white/2.5 absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/50 stroke-black/70 dark:stroke-white/10"
-          >
-            <defs>
-              <pattern
-                id=":R1d6hd6:"
-                width="72"
-                height="56"
-                patternUnits="userSpaceOnUse"
-                x="50%"
-                y="16"
-              >
-                <path d="M.5 56V.5H72" fill="none"></path>
-              </pattern>
-            </defs>
-            <rect
-              width="100%"
-              height="100%"
-              strokeWidth="0"
-              fill="url(#:R1d6hd6:)"
-            ></rect>
-            <svg x="50%" y="16" className="overflow-visible">
-              <rect strokeWidth="0" width="73" height="57" x="0" y="56"></rect>
-              <rect
-                strokeWidth="0"
-                width="73"
-                height="57"
-                x="72"
-                y="168"
-              ></rect>
-            </svg>
-          </svg>
-        </div>
+      <div className="mx-2 mt-2 overflow-hidden rounded-md border dark:border-zinc-700">
+        {isLoading && (
+          <div className="aspect-square w-full animate-pulse bg-gray-200 dark:bg-zinc-700"></div>
+        )}
+        <img
+          alt="Icon"
+          className="bg-cover"
+          style={{ opacity: isVisible ? 1 : 0 }}
+          ref={imgRef}
+          src={isVisible ? props.imageUrl : ""}
+          onLoad={handleImageLoad}
+        />
       </div>
-      <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-zinc-900/10 group-hover:ring-zinc-900/10 dark:ring-white/10 dark:group-hover:ring-white/20"></div>
-      <div className="relative flex items-center gap-4 rounded-2xl p-4 pt-16">
-        <div className="flex h-24 w-24 items-center justify-center rounded-md border text-black dark:text-white">
-          Logo
-        </div>
+      <div className="flex flex-col p-4 pb-8 xl:p-6">
         <div className="flex flex-col">
-          <h3 className="text-sm font-semibold leading-7 text-zinc-900 dark:text-white">
-            <Link to={props.link}>
-              <span className="absolute inset-0 rounded-2xl"></span>
-              {props.title}
-            </Link>
-          </h3>
-          <p className="mt-1 text-ellipsis text-sm text-zinc-600 dark:text-zinc-400">
+          <span className="text-lg font-bold dark:text-white">
+            {props.title}
+          </span>
+          <p className="mt-4 justify-end text-gray-500 dark:text-gray-400">
             {props.description}
           </p>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
