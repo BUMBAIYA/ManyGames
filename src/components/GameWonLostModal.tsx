@@ -62,7 +62,7 @@ export default function GameWonLostModal(props: IGameWonLostModalProps) {
 
   return (
     <Transition appear show={props.isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={handleCloseModal}>
+      <Dialog as="div" className="relative z-[80]" onClose={handleCloseModal}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -72,10 +72,10 @@ export default function GameWonLostModal(props: IGameWonLostModalProps) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 top-14 bg-zinc-900 bg-opacity-50 dark:bg-zinc-700 dark:bg-opacity-70" />
+          <div className="fixed inset-0 bg-zinc-900 bg-opacity-50 dark:bg-zinc-700 dark:bg-opacity-70" />
         </Transition.Child>
 
-        <div className="fixed inset-0 top-12 overflow-y-auto">
+        <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
