@@ -112,7 +112,7 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
                   <input
                     type="range"
                     min={3}
-                    max={10}
+                    max={7}
                     value={puzzleCol}
                     onChange={(e) => setPuzzleCol(parseInt(e.target.value))}
                     className="accent-emerald-500"
@@ -126,7 +126,7 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
                   <input
                     type="range"
                     min={3}
-                    max={10}
+                    max={7}
                     value={puzzleRow}
                     onChange={(e) => setPuzzleRow(parseInt(e.target.value))}
                     className="accent-emerald-500"

@@ -5,6 +5,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import useEvent from "../../hooks/useEvent";
+import useLocalStorage from "../../hooks/useLocalStorage";
 import { classNames } from "../../utility/css";
 import { splitImageToTiles, verifyImageUrl } from "../../utility/image";
 import GameWonLostModal from "../GameWonLostModal";
@@ -16,11 +17,15 @@ export interface IPuzzleProps {}
 
 export default function SlidePuzzleBoard(props: IPuzzleProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const refLoadingError = useRef<HTMLElement>(null);
 
-  const [boardTileDimenstion, setBoardTileDimension] = useState({
-    col: 7,
-    row: 5,
-  });
+  const [boardTileDimenstion, setBoardTileDimension] = useLocalStorage(
+    "slidingpuzzle-boardsize",
+    {
+      col: 7,
+      row: 5,
+    }
+  );
   const [board, setBoard] = useState(
     new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row)
   );
@@ -30,6 +35,10 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
   const [openWonModal, setOpenWonModal] = useState<boolean>(true);
   const [loadingBoard, setLoadingBoard] = useState<boolean>(true);
+  const [lowestMoves, setLowestMoves] = useLocalStorage<number>(
+    "slidepuzzle-lowestmoves",
+    0
+  );
 
   useEffect(() => {
     setLoadingBoard(true);
@@ -44,6 +53,15 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
           boardTileDimenstion.col
         );
         setImageTiles(tileImages);
+      } else {
+        if (refLoadingError.current) {
+          refLoadingError.current.innerHTML =
+            "Error! Check Internet connection or reload page";
+          refLoadingError.current.style.color = "red";
+          refLoadingError.current.previousElementSibling?.classList.toggle(
+            "hidden"
+          );
+        }
       }
       setLoadingBoard(!valid);
     }
@@ -113,6 +131,9 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     setOpenWonModal(false);
     handleResetGame();
     setOpenWonModal(true);
+    if (board.movesCount < lowestMoves || lowestMoves === 0) {
+      setLowestMoves(board.movesCount);
+    }
   };
 
   const renderWonModal = () => {
@@ -124,7 +145,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
           closeModal={handleCloseWonModal}
           stats={{
             game: "slidePuzzle",
-            isLowestScore: true,
+            isLowestScore: board.movesCount < lowestMoves ? true : false,
             totalMoves: board.movesCount,
             row: boardTileDimenstion.row,
             col: boardTileDimenstion.col,
@@ -141,13 +162,15 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
         {loadingBoard && (
           <div className="flex w-full max-w-3xl items-center justify-center gap-2 text-zinc-900 dark:text-emerald-400">
             <ArrowPathIcon className="h-6 w-6 animate-spin stroke-zinc-900 dark:stroke-emerald-400" />
-            <h1 className="text-2xl">Building board...</h1>
+            <span ref={refLoadingError} className="text-2xl">
+              Building board...
+            </span>
           </div>
         )}
         {!loadingBoard && (
           <div
             className={classNames(
-              board.hasWon() ? "" : "gap-0.5 md:gap-1",
+              board.hasWon() ? "" : "gap-1",
               "grid w-full max-w-3xl select-none rounded-md bg-zinc-900 p-1 dark:bg-emerald-800"
             )}
             style={{
@@ -182,29 +205,37 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
           </div>
         )}
         <div className="flex w-full items-center justify-between gap-4 lg:w-auto lg:flex-col">
-          <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 lg:w-full">
-            <span className="text-xs sm:text-base">Moves</span>
-            <p className="text-base font-semibold sm:text-3xl">
-              {board.movesCount}
-            </p>
+          <div className="flex flex-row gap-2 lg:flex-col">
+            <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 lg:w-full">
+              <span className="text-xs sm:text-base">Moves</span>
+              <p className="text-base font-semibold sm:text-3xl">
+                {board.movesCount}
+              </p>
+            </div>
+            <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20">
+              <span className="text-xs sm:text-base">LOWEST MOVES</span>
+              <p className="text-base font-semibold sm:text-3xl">
+                {lowestMoves}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-2 lg:flex-col">
+          <div className="flex w-auto items-center gap-2 lg:w-full lg:flex-col">
             <button
-              className="w-full rounded-md bg-emerald-400/10 p-2 text-base font-semibold ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 sm:px-4 lg:text-lg"
+              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
               onClick={() => setOpenPreviewModal((prev) => !prev)}
             >
-              <span className="hidden text-base font-semibold text-emerald-600 dark:text-emerald-300 sm:block lg:text-lg">
+              <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
                 {openPreviewModal ? "Hide" : "Preview"}
               </span>
               {openPreviewModal ? (
-                <EyeSlashIcon className="block h-6 w-6 stroke-emerald-600 dark:stroke-emerald-400 sm:hidden" />
+                <EyeSlashIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
               ) : (
-                <EyeIcon className="block h-6 w-6 stroke-emerald-600 dark:stroke-emerald-400 sm:hidden" />
+                <EyeIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
               )}
             </button>
 
             <button
-              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset  dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full "
+              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
               onClick={handleResetGame}
             >
               <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
@@ -214,7 +245,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
             </button>
 
             <button
-              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1  dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4"
+              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
               onClick={() => setOpenSettingModal(true)}
             >
               <span className="text-base font-semibold text-white dark:text-zinc-900 lg:text-lg">

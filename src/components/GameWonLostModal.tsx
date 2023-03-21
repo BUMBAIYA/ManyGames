@@ -21,7 +21,7 @@ export interface IGameWonLostModalProps {
   type: "won" | "lost";
   isOpen: boolean;
   closeModal: () => void;
-  stats?: SlidePuzzleStatsType | Puzzle2048StatsType;
+  stats: SlidePuzzleStatsType | Puzzle2048StatsType;
 }
 
 export default function GameWonLostModal(props: IGameWonLostModalProps) {
@@ -36,11 +36,11 @@ export default function GameWonLostModal(props: IGameWonLostModalProps) {
           <div className="mt-4">
             <p className="mb-1 text-sm text-gray-500">
               {`${
-                props.stats?.isLowestScore ? "New Lowest Score" : "Score"
-              } for ${props.stats?.row}x${props.stats?.col} board`}
+                props.stats.isLowestScore ? "New Lowest Score" : "Score"
+              } for ${props.stats.row}x${props.stats?.col} board`}
             </p>
             <p className="text-3xl font-bold text-emerald-500">
-              {props.stats?.totalMoves}
+              {props.stats.totalMoves}
             </p>
           </div>
         );

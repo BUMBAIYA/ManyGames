@@ -2,15 +2,24 @@ import { ArrowPathIcon } from "@heroicons/react/24/outline";
 
 type GameDetailProps = {
   score: number;
+  highScore: number;
   resetGame: () => void;
 };
 
 export default function GameDetails(props: GameDetailProps) {
   return (
     <div className="flex w-full flex-row justify-between gap-6 px-2 py-1 md:w-max md:flex-col">
-      <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20">
-        <span className="text-xs sm:text-base">SCORE</span>
-        <p className="text-base font-semibold sm:text-3xl">{props.score}</p>
+      <div className="flex flex-row gap-2 md:flex-col">
+        <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20">
+          <span className="text-xs sm:text-base">SCORE</span>
+          <p className="text-base font-semibold sm:text-3xl">{props.score}</p>
+        </div>
+        <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20">
+          <span className="text-xs sm:text-base">HIGH SCORE</span>
+          <p className="text-base font-semibold sm:text-3xl">
+            {props.highScore}
+          </p>
+        </div>
       </div>
       <div>
         <button

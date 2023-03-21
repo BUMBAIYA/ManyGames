@@ -5,6 +5,7 @@ import GameTile from "./GameTile";
 import GameDetails from "./GameDetails";
 import "../../styles/scss/2048.scss";
 import GameWonLostModal from "../GameWonLostModal";
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 type GameBoardProps = {
   size?: number;
@@ -13,6 +14,10 @@ type GameBoardProps = {
 export default function GameBoard({ size = 4 }: GameBoardProps) {
   const [board, setBoard] = useState(new Board(size));
   const [openWonModal, setOpenWonModal] = useState<boolean>(true);
+  const [highScore, setHighScore] = useLocalStorage<number>(
+    "2048-highscore",
+    0
+  );
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.currentTarget !== document.activeElement) return;
@@ -49,6 +54,9 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
       default: {
         return;
       }
+    }
+    if (board.score > highScore) {
+      setHighScore(board.score);
     }
   };
 
@@ -94,7 +102,7 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
           closeModal={handleCloseWonModal}
           stats={{
             game: "2048",
-            isHighScore: true,
+            isHighScore: board.score > highScore ? true : false,
             score: board.score,
           }}
         />
@@ -121,7 +129,11 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
         <div className="flex flex-col gap-1 sm:gap-2">{cells}</div>
         {tiles}
       </div>
-      <GameDetails score={board.score} resetGame={handleResetGame} />
+      <GameDetails
+        score={board.score}
+        resetGame={handleResetGame}
+        highScore={highScore}
+      />
       {renderWonModal()}
     </div>
   );

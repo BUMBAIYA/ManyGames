@@ -4,22 +4,18 @@ import {
   SunIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 export default function ThemeSwitchButton() {
+  const [theme, setTheme] = useLocalStorage<string>("theme", "light");
   const handleToggle = () => {
     document.documentElement.classList.toggle("dark");
-    if (localStorage.getItem("theme") === "light")
-      localStorage.setItem("theme", "dark");
-    else localStorage.setItem("theme", "light");
+    if (theme === "light") setTheme("dark");
+    else setTheme("light");
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("theme")) {
-      localStorage.setItem("theme", "light");
-    } else {
-      if (localStorage.getItem("theme") === "dark")
-        document.documentElement.setAttribute("class", "dark");
-    }
+    document.documentElement.setAttribute("class", theme);
   }, []);
 
   return (
