@@ -9,6 +9,7 @@ import useLocalStorage from "../../hooks/useLocalStorage";
 import { classNames } from "../../utility/css";
 import { splitImageToTiles, verifyImageUrl } from "../../utility/image";
 import GameWonLostModal from "../GameWonLostModal";
+import PageMeta from "../PageMeta";
 import { GameBoard } from "./GameLogic";
 import PreviewModal from "./PreviewModal";
 import { SlidePuzzleSettingModal } from "./SettingModal";
@@ -157,6 +158,10 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
 
   return (
     <div className="flex flex-col justify-center gap-10">
+      <PageMeta
+        title="ManyGames | Slide Puzzle"
+        description="Play sliding puzzle online with different levels of difficulties"
+      />
       <canvas ref={canvasRef} className="hidden"></canvas>
       <div className="flex w-full flex-col-reverse items-center justify-center gap-6 lg:flex-row lg:items-start">
         {loadingBoard && (

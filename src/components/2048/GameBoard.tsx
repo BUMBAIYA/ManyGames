@@ -6,6 +6,7 @@ import GameDetails from "./GameDetails";
 import "../../styles/scss/2048.scss";
 import GameWonLostModal from "../GameWonLostModal";
 import useLocalStorage from "../../hooks/useLocalStorage";
+import PageMeta from "../PageMeta";
 
 type GameBoardProps = {
   size?: number;
@@ -125,6 +126,7 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
 
   return (
     <div className="flex flex-col-reverse items-center gap-8 md:flex-row md:items-start md:justify-center">
+      <PageMeta title="ManyGames | 2048" description="Play 2048 online" />
       <div className="relative">
         <div className="flex flex-col gap-1 sm:gap-2">{cells}</div>
         {tiles}

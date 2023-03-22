@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { GameCardPropsType } from "./components/GameCard";
+import PageMeta from "../components/PageMeta";
 
 const GameCard = lazy(() => import("./components/GameCard"));
 
@@ -24,6 +25,11 @@ const GameCardFallback: React.FC<GameCardPropsType> = (props) => {
 export default function Hero() {
   return (
     <>
+      <PageMeta
+        title="ManyGames | Home"
+        description="ManyGames, your go-to destination for fun and addictive word
+        games and puzzles!"
+      />
       <h1 className="text-2xl font-bold dark:text-white">Many games</h1>
       <p className="dark:text-zinc-400">
         Welcome to ManyGames, your go-to destination for fun and addictive word
