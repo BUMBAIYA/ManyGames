@@ -1,63 +1,18 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Fragment } from "react";
+import { Fragment, ReactNode } from "react";
 import ConfettiComponent from "./ConfettiComponent";
-
-type SlidePuzzleStatsType = {
-  game: "slidePuzzle";
-  row: number;
-  col: number;
-  isLowestScore: boolean;
-  totalMoves: number;
-};
-
-type Puzzle2048StatsType = {
-  game: "2048";
-  isHighScore: boolean;
-  score: number;
-};
 
 export interface IGameWonLostModalProps {
   type: "won" | "lost";
   isOpen: boolean;
   closeModal: () => void;
-  stats: SlidePuzzleStatsType | Puzzle2048StatsType;
+  children: ReactNode;
 }
 
 export default function GameWonLostModal(props: IGameWonLostModalProps) {
   const handleCloseModal = () => {
     props.closeModal();
-  };
-
-  const renderStats = () => {
-    switch (props.stats?.game) {
-      case "slidePuzzle": {
-        return (
-          <div className="mt-4">
-            <p className="mb-1 text-sm text-gray-500">
-              {`${
-                props.stats.isLowestScore ? "New Lowest Score" : "Score"
-              } for ${props.stats.row}x${props.stats?.col} board`}
-            </p>
-            <p className="text-3xl font-bold text-emerald-500">
-              {props.stats.totalMoves}
-            </p>
-          </div>
-        );
-      }
-      case "2048": {
-        return (
-          <div className="mt-4">
-            <p className="mb-1 text-sm text-gray-500">
-              {`${props.stats?.isHighScore ? "New High Score" : "Score"}`}
-            </p>
-            <p className="text-3xl font-bold text-emerald-500">
-              {props.stats?.score}
-            </p>
-          </div>
-        );
-      }
-    }
   };
 
   return (
@@ -101,7 +56,7 @@ export default function GameWonLostModal(props: IGameWonLostModalProps) {
                     <XMarkIcon className="h-5 w-5 text-zinc-900 dark:text-white" />
                   </button>
                 </div>
-                {renderStats()}
+                {props.children}
               </Dialog.Panel>
             </Transition.Child>
           </div>

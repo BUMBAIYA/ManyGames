@@ -12,6 +12,22 @@ type GameBoardProps = {
   size?: number;
 };
 
+type Puzzle2048StatsType = {
+  isHighScore: boolean;
+  score: number;
+};
+
+const modalMessage = (props: Puzzle2048StatsType) => {
+  return (
+    <div className="mt-4">
+      <p className="mb-1 text-sm text-gray-500">
+        {`${props.isHighScore ? "New High Score" : "Score"}`}
+      </p>
+      <p className="text-3xl font-bold text-emerald-500">{props.score}</p>
+    </div>
+  );
+};
+
 export default function GameBoard({ size = 4 }: GameBoardProps) {
   const [board, setBoard] = useState(new Board(size));
   const [openWonModal, setOpenWonModal] = useState<boolean>(true);
@@ -101,11 +117,10 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
           type="won"
           isOpen={openWonModal}
           closeModal={handleCloseWonModal}
-          stats={{
-            game: "2048",
+          children={modalMessage({
             isHighScore: board.score > highScore ? true : false,
             score: board.score,
-          }}
+          })}
         />
       );
     } else if (board.hasLost()) {
@@ -114,11 +129,10 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
           type="lost"
           isOpen={openWonModal}
           closeModal={handleCloseWonModal}
-          stats={{
-            game: "2048",
-            isHighScore: true,
+          children={modalMessage({
+            isHighScore: board.score > highScore ? true : false,
             score: board.score,
-          }}
+          })}
         />
       );
     } else null;
