@@ -7,7 +7,7 @@ module.exports = {
       keyframes: {
         show: {
           "0%": { opacity: "50%", scale: "0%" },
-          "100%": { opacity: "100%", sclae: "100%" },
+          "100%": { opacity: "100%", scale: "100%" },
         },
       },
       animation: {
