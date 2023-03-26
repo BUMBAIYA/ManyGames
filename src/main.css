@@ -7,3 +7,46 @@
     @apply m-0 box-border bg-gray-100 p-0 antialiased dark:bg-zinc-900;
   }
 }
+
+@layer utilities {
+  @keyframes spinx {
+    from {
+      transform: rotateY(0);
+    }
+    to {
+      transform: rotateY(360deg);
+    }
+  }
+
+  @keyframes hide {
+    0% {
+      transform: translateY(0);
+      opacity: 100%;
+    }
+    20% {
+      opacity: 100%;
+    }
+    100% {
+      transform: translateY(-1rem);
+      opacity: 0%;
+    }
+  }
+
+  @keyframes wrong-ziggle {
+    0% {
+      transform: translateX(0rem);
+      background-color: red;
+    }
+    25% {
+      transform: translateX(0.1rem);
+      background-color: rgba(red, 75%);
+    }
+    75% {
+      transform: translateX(-0.2rem);
+      background-color: rgba(red, 25%);
+    }
+    100% {
+      transform: translateX(0.1rem);
+    }
+  }
+}
