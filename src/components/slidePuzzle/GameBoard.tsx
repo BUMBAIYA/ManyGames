@@ -14,26 +14,6 @@ import { GameBoard } from "./GameLogic";
 import PreviewModal from "./PreviewModal";
 import { SlidePuzzleSettingModal } from "./SettingModal";
 
-type SlidePuzzleStatsType = {
-  row: number;
-  col: number;
-  isLowestScore: boolean;
-  totalMoves: number;
-};
-
-const modalMessage = (props: SlidePuzzleStatsType) => {
-  return (
-    <div className="mt-4">
-      <p className="mb-1 text-sm text-gray-500">
-        {`${props.isLowestScore ? "New Lowest Score" : "Score"} for ${
-          props.row
-        }x${props.col} board`}
-      </p>
-      <p className="text-3xl font-bold text-emerald-500">{props.totalMoves}</p>
-    </div>
-  );
-};
-
 export interface IPuzzleProps {}
 
 export default function SlidePuzzleBoard(props: IPuzzleProps) {
@@ -157,24 +137,6 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     }
   };
 
-  const renderWonModal = () => {
-    if (board.won) {
-      return (
-        <GameWonLostModal
-          type="won"
-          isOpen={openWonModal}
-          closeModal={handleCloseWonModal}
-          children={modalMessage({
-            isLowestScore: board.movesCount < lowestMoves ? true : false,
-            totalMoves: board.movesCount,
-            row: boardTileDimenstion.row,
-            col: boardTileDimenstion.col,
-          })}
-        />
-      );
-    } else null;
-  };
-
   return (
     <div className="flex flex-col justify-center gap-10">
       <PageMeta
@@ -279,7 +241,6 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
           </div>
         </div>
       </div>
-      {renderWonModal()}
       <SlidePuzzleSettingModal
         isOpen={openSettingModal}
         closeModal={handleCloseSettingModal}
@@ -293,6 +254,26 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
         closeModal={() => setOpenPreviewModal(false)}
         imageUrl={imageUrl}
       />
+      {board.hasWon() && (
+        <GameWonLostModal
+          isOpen={openWonModal}
+          closeModal={handleCloseWonModal}
+          type="won"
+        >
+          <div className="mt-4">
+            <p className="mb-1 text-sm text-gray-500">
+              {`${
+                board.movesCount < lowestMoves ? "New Lowest Score" : "Score"
+              } for ${boardTileDimenstion.row}x${
+                boardTileDimenstion.col
+              } board`}
+            </p>
+            <p className="text-3xl font-bold text-emerald-500">
+              {board.movesCount}
+            </p>
+          </div>
+        </GameWonLostModal>
+      )}
     </div>
   );
 }

@@ -12,22 +12,6 @@ type GameBoardProps = {
   size?: number;
 };
 
-type Puzzle2048StatsType = {
-  isHighScore: boolean;
-  score: number;
-};
-
-const modalMessage = (props: Puzzle2048StatsType) => {
-  return (
-    <div className="mt-4">
-      <p className="mb-1 text-sm text-gray-500">
-        {`${props.isHighScore ? "New High Score" : "Score"}`}
-      </p>
-      <p className="text-3xl font-bold text-emerald-500">{props.score}</p>
-    </div>
-  );
-};
-
 export default function GameBoard({ size = 4 }: GameBoardProps) {
   const [board, setBoard] = useState(new Board(size));
   const [openWonModal, setOpenWonModal] = useState<boolean>(true);
@@ -110,34 +94,6 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
     setOpenWonModal(true);
   };
 
-  const renderWonModal = () => {
-    if (board.hasWon()) {
-      return (
-        <GameWonLostModal
-          type="won"
-          isOpen={openWonModal}
-          closeModal={handleCloseWonModal}
-          children={modalMessage({
-            isHighScore: board.score > highScore ? true : false,
-            score: board.score,
-          })}
-        />
-      );
-    } else if (board.hasLost()) {
-      return (
-        <GameWonLostModal
-          type="lost"
-          isOpen={openWonModal}
-          closeModal={handleCloseWonModal}
-          children={modalMessage({
-            isHighScore: board.score > highScore ? true : false,
-            score: board.score,
-          })}
-        />
-      );
-    } else null;
-  };
-
   return (
     <div className="flex flex-col-reverse items-center gap-8 md:flex-row md:items-start md:justify-center">
       <PageMeta title="ManyGames | 2048" description="Play 2048 online" />
@@ -150,7 +106,34 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
         resetGame={handleResetGame}
         highScore={highScore}
       />
-      {renderWonModal()}
+      {board.hasWon() && (
+        <GameWonLostModal
+          isOpen={openWonModal}
+          closeModal={handleCloseWonModal}
+          type="won"
+        >
+          <div className="mt-4">
+            <p className="mb-1 text-sm text-gray-500">
+              {`${board.score > highScore ? "New High Score" : "Score"}`}
+            </p>
+            <p className="text-3xl font-bold text-emerald-500">{board.score}</p>
+          </div>
+        </GameWonLostModal>
+      )}
+      {(board.hasLost() || board.hasWon()) && (
+        <GameWonLostModal
+          isOpen={openWonModal}
+          closeModal={handleCloseWonModal}
+          type={board.hasWon() ? "won" : "lost"}
+        >
+          <div className="mt-4">
+            <p className="mb-1 text-sm text-gray-500">
+              {`${board.score > highScore ? "New High Score" : "Score"}`}
+            </p>
+            <p className="text-3xl font-bold text-emerald-500">{board.score}</p>
+          </div>
+        </GameWonLostModal>
+      )}
     </div>
   );
 }

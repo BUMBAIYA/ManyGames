@@ -3,24 +3,22 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment, ReactNode } from "react";
 import ConfettiComponent from "./ConfettiComponent";
 
-export interface IGameWonLostModalProps {
+export interface IGameWonLostModalProps<T> {
+  children?: ReactNode | T;
   type: "won" | "lost";
   isOpen: boolean;
   closeModal: () => void;
-  children: ReactNode;
 }
 
-export default function GameWonLostModal(props: IGameWonLostModalProps) {
-  const handleCloseModal = () => {
-    props.closeModal();
-  };
-
+export default function GameWonLostModal<T extends ReactNode>(
+  props: IGameWonLostModalProps<T>
+) {
   return (
     <Transition appear show={props.isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-[80]" onClose={handleCloseModal}>
+      <Dialog as="div" className="relative z-[80]" onClose={props.closeModal}>
         <Transition.Child
           as={Fragment}
-          enter="ease-out duration-300"
+          enter="ease-out duration-300 delay-1000"
           enterFrom="opacity-0"
           enterTo="opacity-100"
           leave="ease-in duration-200"
@@ -34,7 +32,7 @@ export default function GameWonLostModal(props: IGameWonLostModalProps) {
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-300"
+              enter="ease-out duration-300 delay-1000"
               enterFrom="opacity-0 scale-95"
               enterTo="opacity-100 scale-100"
               leave="ease-in duration-200"
@@ -49,10 +47,7 @@ export default function GameWonLostModal(props: IGameWonLostModalProps) {
                   >
                     {props.type === "won" ? "You Won" : "You Lost"}
                   </Dialog.Title>
-                  <button
-                    onClick={() => props.closeModal()}
-                    className="outline-none"
-                  >
+                  <button onClick={props.closeModal} className="outline-none">
                     <XMarkIcon className="h-5 w-5 text-zinc-900 dark:text-white" />
                   </button>
                 </div>
