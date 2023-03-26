@@ -23,6 +23,15 @@ const LINKS: LinkType[] = [
       },
     ],
   },
+  {
+    category: "Word",
+    games: [
+      {
+        name: "Wordle",
+        link: "wordle",
+      },
+    ],
+  },
 ];
 
 export interface ISidebarNavLinkProps {

@@ -10,6 +10,7 @@ const GameBoard = lazy(() => import("../components/2048/GameBoard"));
 const SlidePuzzleBoard = lazy(
   () => import("../components/slidePuzzle/GameBoard")
 );
+const WordleGameBoard = lazy(() => import("../components/wordle/GameBoard"));
 const GameBoardWithFallback = () => (
   <Suspense fallback={<LoadingGame />}>
     <GameBoard />
@@ -19,6 +20,12 @@ const GameBoardWithFallback = () => (
 const SlidePuzzleBoardWithFallback = () => (
   <Suspense fallback={<LoadingGame />}>
     <SlidePuzzleBoard />
+  </Suspense>
+);
+
+const WordleGameBoardWithFallback = () => (
+  <Suspense fallback={<LoadingGame />}>
+    <WordleGameBoard />
   </Suspense>
 );
 
@@ -38,6 +45,10 @@ export const GameRoutes: RouteObject = {
         {
           path: "/puzzle",
           element: <SlidePuzzleBoardWithFallback />,
+        },
+        {
+          path: "/wordle",
+          element: <WordleGameBoardWithFallback />,
         },
       ],
     },

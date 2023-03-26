@@ -58,6 +58,12 @@ export default function Hero() {
             title="Puzzle"
             description="Solve the puzzle by shuffling tiles"
           />
+          <GameCardFallback
+            imageUrl="/assets/wordleIcon.png"
+            link="/wordle"
+            title="Wordle"
+            description="Short word guessing game"
+          />
         </div>
       </div>
     </>
