@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import PageMeta from "../PageMeta";
 import { WordleLogic } from "./GameLogic";
-import { KeyBoard } from "./KeyBoard";
+import { KeyBoard, KeyBoardResponse } from "./KeyBoard";
 import { WorldLetter } from "./WordleLetter";
-import { useDictionaryApi } from "../../utility/word";
+import { useDictionaryApi, isWordValid } from "../../utility/word";
 import GameWonLostModal from "../GameWonLostModal";
 import useEvent from "../../hooks/useEvent";
 
@@ -13,14 +13,37 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
   const refNotValidText = useRef<HTMLDivElement>(null);
   const [openModal, setOpenModal] = useState<boolean>(true);
   const [board, setBoard] = useState(new WordleLogic("hello"));
+  const [wordMeaning, setWordMeaning] = useState<string>(
+    "used as a greeting or to begin a phone conversation"
+  );
   const [wrongWordGuessed, setWrongWordGuessed] = useState<string[]>([]);
 
   const { isWordValid, generateWord } = useDictionaryApi();
 
   const getInitialRandomWord = async () => {
     const word = await generateWord();
-    console.log(word);
-    setBoard(new WordleLogic(word));
+    const data = await isWordValid(word);
+    if (data) {
+      setBoard(new WordleLogic(word));
+      setWordMeaning(data.definition);
+    }
+  };
+
+  const checkWordValidity = async (word: string) => {
+    let boardClone = createDeepClone();
+    const isValid = await isWordValid(word);
+    if (isValid) {
+      let newBoard = boardClone.onEnter();
+      if (newBoard) {
+        setBoard(newBoard);
+      }
+    } else {
+      handleShowError();
+      if (!wrongWordGuessed.includes(word)) {
+        setWrongWordGuessed((prev) => [...prev, word]);
+      }
+      return;
+    }
   };
 
   const handleShowError = () => {
@@ -30,96 +53,45 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
     }, 2000);
   };
 
-  const handleKeyStroke = (value: string) => {
-    let boardClone = Object.assign(
+  const createDeepClone = () => {
+    const boardClone: WordleLogic = Object.assign(
       Object.create(Object.getPrototypeOf(board)),
       board
     );
-    switch (value) {
-      case "enter": {
-        const word = WordleLogic.getWord(board.testWord, board.currentAttempt);
-        if (word === "" || word.length !== 5) break;
-        if (wrongWordGuessed.includes(word)) {
-          handleShowError();
-          break;
-        }
-        async function check() {
-          const isValid = await isWordValid(word);
-          if (isValid) {
-            let newBoard = boardClone.onEnter();
-            if (newBoard) {
-              setBoard(newBoard);
-            }
-          } else {
-            handleShowError();
-            if (!wrongWordGuessed.includes(word)) {
-              setWrongWordGuessed((prev) => [...prev, word]);
-            }
-            return;
-          }
-        }
-        check();
-        break;
-      }
-      case "delete": {
-        let newBoard = boardClone.onDelete();
-        if (newBoard) {
-          setBoard(newBoard);
-        }
-        break;
-      }
-      default: {
-        let newBoard = boardClone.onKeyPressed(value);
-        if (newBoard) {
-          setBoard(newBoard);
-        }
-      }
-    }
+    return boardClone;
   };
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.currentTarget !== document.activeElement) return;
-    if (
-      (65 > event.keyCode || event.keyCode > 90) &&
-      event.keyCode !== 8 &&
-      event.keyCode !== 13
-    ) {
-      return;
-    }
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    getInitialRandomWord();
+    setOpenModal(true);
+  };
 
-    if (event.repeat) return;
-    let boardClone = Object.assign(
-      Object.create(Object.getPrototypeOf(board)),
-      board
-    );
-    switch (event.keyCode) {
-      case 13: {
+  const handleKeyDown = (event: KeyboardEvent | KeyBoardResponse) => {
+    if (event instanceof KeyboardEvent) {
+      if (event.currentTarget !== document.activeElement) return;
+      if (
+        (65 > event.keyCode || event.keyCode > 90) &&
+        event.keyCode !== 8 &&
+        event.keyCode !== 13
+      ) {
+        return;
+      }
+      if (event.repeat) return;
+    }
+    switch (event.key) {
+      case "Enter": {
         const word = WordleLogic.getWord(board.testWord, board.currentAttempt);
         if (word === "" || word.length !== 5) break;
         if (wrongWordGuessed.includes(word)) {
-          console.log("repeated word");
           handleShowError();
           break;
         }
-        async function check() {
-          const isValid = await isWordValid(word);
-          if (isValid) {
-            let newBoard = boardClone.onEnter();
-            if (newBoard) {
-              setBoard(newBoard);
-            }
-          } else {
-            handleShowError();
-            if (!wrongWordGuessed.includes(word)) {
-              setWrongWordGuessed((prev) => [...prev, word]);
-            }
-            return;
-          }
-        }
-        check();
+        checkWordValidity(word);
         break;
       }
-      case 8: {
+      case "Backspace": {
+        let boardClone = createDeepClone();
         let newBoard = boardClone.onDelete();
         if (newBoard) {
           setBoard(newBoard);
@@ -127,6 +99,7 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
         break;
       }
       default: {
+        let boardClone = createDeepClone();
         let newBoard = boardClone.onKeyPressed(event.key);
         if (newBoard) {
           setBoard(newBoard);
@@ -137,12 +110,6 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
   };
 
   useEvent(document.body, "keydown", handleKeyDown, false);
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    getInitialRandomWord();
-    setOpenModal(true);
-  };
 
   useEffect(() => {
     getInitialRandomWord();
@@ -177,7 +144,7 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
           );
         })}
       </div>
-      <KeyBoard getValue={handleKeyStroke} />
+      <KeyBoard getValue={handleKeyDown} />
       {(board.hasWon() || board.hasLost()) && (
         <GameWonLostModal
           isOpen={openModal}
@@ -186,21 +153,27 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
         >
           <div className="mt-4">
             <div className="text-md mb-1 text-gray-500">
-              <pre>
-                Word was{" "}
-                <span className="text-xl font-bold text-emerald-500">
-                  {board.correctWord}
+              <div>
+                {board.hasLost() ? "Word was " : ""}
+                <span className="text-2xl font-extrabold text-emerald-500">
+                  {board.correctWord.charAt(0).toLocaleUpperCase() +
+                    board.correctWord.substring(1)}
                 </span>
-              </pre>
+              </div>
             </div>
-            {board.hasWon() && (
-              <>
-                <p className="mb-1 text-sm text-gray-500">Total Attempts</p>
-                <p className="text-3xl font-bold text-emerald-500">
-                  {board.currentAttempt - 1}
-                </p>
-              </>
-            )}
+          </div>
+          <div className="mt-2">
+            <div className="text-sm text-gray-500">
+              Definition{" "}
+              <span className="text-md font-semibold text-emerald-500">
+                "
+                {wordMeaning.replace(
+                  wordMeaning[0],
+                  wordMeaning[0].toLocaleUpperCase()
+                )}
+                "
+              </span>
+            </div>
           </div>
         </GameWonLostModal>
       )}
