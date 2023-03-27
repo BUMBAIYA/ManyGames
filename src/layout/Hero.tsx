@@ -36,8 +36,8 @@ export default function Hero() {
         games and puzzles! My goal as solo developer is to add one game every
         week to give users the variety in games.
       </p>
-      <div className="my-16 xl:max-w-none">
-        <h2 className="scroll-mt-24 text-xl font-bold dark:text-white">
+      <div className="my-16 flex flex-col items-center">
+        <h2 className="w-full scroll-mt-24 text-xl font-bold dark:text-white">
           <Link
             className="group text-inherit no-underline hover:text-inherit"
             to="/#wordgames"
@@ -45,7 +45,7 @@ export default function Hero() {
             Games
           </Link>
         </h2>
-        <div className="grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-4 dark:border-white/5 sm:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-4 dark:border-white/5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           <GameCardFallback
             imageUrl="/assets/2048Icon.png"
             link="/2048"

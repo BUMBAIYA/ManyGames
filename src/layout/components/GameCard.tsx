@@ -41,7 +41,7 @@ export default function GameCard(props: GameCardPropsType) {
   return (
     <Link
       to={props.link}
-      className="flex flex-col overflow-hidden rounded-xl border border-gray-300 bg-white transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800"
+      className="flex flex-col overflow-hidden rounded-xl border border-gray-300 bg-white transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800 dark:hover:shadow-black"
     >
       <div className="mx-2 mt-2 overflow-hidden rounded-md border dark:border-zinc-700">
         {isLoading && (
@@ -49,19 +49,19 @@ export default function GameCard(props: GameCardPropsType) {
         )}
         <img
           alt="Icon"
-          className="bg-cover"
+          className="w-full bg-cover"
           style={{ opacity: isVisible ? 1 : 0 }}
           ref={imgRef}
           src={isVisible ? props.imageUrl : ""}
           onLoad={handleImageLoad}
         />
       </div>
-      <div className="flex flex-col p-4 pb-8 xl:p-6">
+      <div className="flex flex-col p-4 pb-6 xl:p-6">
         <div className="flex flex-col">
           <span className="text-lg font-bold dark:text-white">
             {props.title}
           </span>
-          <p className="mt-4 justify-end text-gray-500 dark:text-gray-400">
+          <p className="justify-end text-gray-500 dark:text-gray-400">
             {props.description}
           </p>
         </div>
