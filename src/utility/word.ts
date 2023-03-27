@@ -1,28 +1,46 @@
 import { useMemo } from "react";
 
+type dictionaryAPIResponse =
+  | {
+      word: string;
+      meanings: {
+        definitions: {
+          definition: string;
+        }[];
+      }[];
+    }[]
+  | undefined;
+
+export type isWordValid = {
+  word: string;
+  definition: string;
+} | null;
+
 export const useDictionaryApi = () => {
   const dictionaryapi = useMemo(
     () => ({
-      isWordValid(word: string): Promise<boolean> {
+      isWordValid(word: string): Promise<isWordValid> {
         return new Promise(async (reslove) => {
           if (word === "" || word === null) {
-            reslove(false);
+            reslove(null);
             throw new Error(
               "isWordValid: paramer word is possibly empty or null"
             );
           }
           try {
-            const data = await fetch(
+            const data: dictionaryAPIResponse = await fetch(
               `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
             ).then((res) => res.json());
-            if (data[0] === undefined) {
-              reslove(false);
+            if (data === undefined) {
+              reslove(null);
             } else {
-              reslove(true);
+              reslove({
+                word,
+                definition: data[0].meanings[0].definitions[0].definition,
+              });
             }
           } catch (error) {
-            reslove(false);
-            console.warn(`Unable to fing word: ${word}`);
+            reslove(null);
           }
         });
       },
@@ -39,7 +57,9 @@ export const useDictionaryApi = () => {
               });
           } catch (error) {
             resolve("hello");
-            console.error("Unable to fetch wordle bank");
+            throw new Error(
+              "Unable to load word-bank file check internet connection"
+            );
           }
         });
       },
