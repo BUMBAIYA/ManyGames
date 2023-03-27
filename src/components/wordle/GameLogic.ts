@@ -15,7 +15,7 @@ export class WordleLogic {
 
   constructor(_correctWord: string, _attempts: number = 6) {
     this.correctWord = _correctWord.toLowerCase();
-    this.correctWordLength = this.correctWord.length;
+    this.correctWordLength = 5;
     this.totalAttempts = _attempts;
     this.currentAttempt = 1;
     this.testWord = [];
