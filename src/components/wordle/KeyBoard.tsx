@@ -1,7 +1,11 @@
 import { classNames } from "../../utility/css";
 
+export type KeyBoardResponse = {
+  key: string;
+};
+
 export interface IKeyBoardProps {
-  getValue: (value: string) => void;
+  getValue: ({ key }: KeyBoardResponse) => void;
 }
 
 export interface IKeyBoardKeyProps {
@@ -9,13 +13,13 @@ export interface IKeyBoardKeyProps {
   isDisable: boolean;
 }
 
-export const TopLevelKeys = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
-export const MiddleLevelKeys = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
-export const BottomLevelLKeys = ["Z", "X", "C", "V", "B", "N", "M"];
+export const TopLevelKeys = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"];
+export const MiddleLevelKeys = ["a", "s", "d", "f", "g", "h", "j", "k", "l"];
+export const BottomLevelLKeys = ["z", "x", "c", "v", "b", "n", "m"];
 
 export function KeyBoard(props: IKeyBoardProps) {
   const handleSubmitKey = (value: string) => {
-    props.getValue(value);
+    props.getValue({ key: value });
   };
 
   const Key = (props: IKeyBoardKeyProps) => {
@@ -46,11 +50,11 @@ export function KeyBoard(props: IKeyBoardProps) {
         })}
       </div>
       <div className="flex gap-1 md:gap-1.5">
-        <Key value={"enter"} isDisable={false} />
+        <Key value={"Enter"} isDisable={false} />
         {BottomLevelLKeys.map((key, index) => {
           return <Key key={index} value={key} isDisable={false} />;
         })}
-        <Key value={"delete"} isDisable={false} />
+        <Key value={"Backspace"} isDisable={false} />
       </div>
     </div>
   );
