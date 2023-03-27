@@ -91,9 +91,11 @@ export class WordleLogic {
   }
 
   onKeyPressed(key: string) {
-    if (this.cursorAt === this.correctWordLength * this.totalAttempts) return;
+    if (this.cursorAt === this.correctWordLength * this.totalAttempts)
+      return null;
     var cursorPos = this.getCursorPosition(this.cursorAt);
-    if (this.cursorAt >= this.currentAttempt * this.correctWordLength) return;
+    if (this.cursorAt >= this.currentAttempt * this.correctWordLength)
+      return null;
     this.testWord[cursorPos.y][cursorPos.x] = {
       value: key.toLocaleLowerCase(),
       status: null,
