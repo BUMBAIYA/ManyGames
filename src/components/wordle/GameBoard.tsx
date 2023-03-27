@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PageMeta from "../PageMeta";
 import { WordleLogic } from "./GameLogic";
 import { KeyBoard } from "./KeyBoard";
@@ -10,22 +10,18 @@ import useEvent from "../../hooks/useEvent";
 export interface IWordleGameBoardProps {}
 
 export default function WordleGameBoard(props: IWordleGameBoardProps) {
-  const wordOfDay = useMemo(() => {}, []);
-  let WORD = "hello";
   const refNotValidText = useRef<HTMLDivElement>(null);
   const [openModal, setOpenModal] = useState<boolean>(true);
-  const [board, setBoard] = useState(new WordleLogic(WORD));
+  const [board, setBoard] = useState(new WordleLogic("hello"));
   const [wrongWordGuessed, setWrongWordGuessed] = useState<string[]>([]);
 
   const { isWordValid, generateWord } = useDictionaryApi();
 
-  useEffect(() => {
-    async function getWord() {
-      const word = await generateWord();
-      setBoard(new WordleLogic(word));
-    }
-    getWord();
-  }, []);
+  const getInitialRandomWord = async () => {
+    const word = await generateWord();
+    console.log(word);
+    setBoard(new WordleLogic(word));
+  };
 
   const handleShowError = () => {
     refNotValidText.current!.style.display = "block";
@@ -144,13 +140,13 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    async function getWord() {
-      const word = await generateWord();
-      setBoard(new WordleLogic(word));
-    }
-    getWord();
+    getInitialRandomWord();
     setOpenModal(true);
   };
+
+  useEffect(() => {
+    getInitialRandomWord();
+  }, []);
 
   return (
     <div className="flex flex-col items-center gap-4 lg:gap-8">
