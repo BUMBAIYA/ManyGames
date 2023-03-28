@@ -4,12 +4,12 @@ import {
   EyeSlashIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
-import useEvent from "../../hooks/useEvent";
-import useLocalStorage from "../../hooks/useLocalStorage";
-import { classNames } from "../../utility/css";
-import { splitImageToTiles, verifyImageUrl } from "../../utility/image";
-import GameWonLostModal from "../GameWonLostModal";
-import PageMeta from "../PageMeta";
+import useEvent from "../../../hooks/useEvent";
+import useLocalStorage from "../../../hooks/useLocalStorage";
+import { classNames } from "../../../utility/css";
+import { splitImageToTiles, verifyImageUrl } from "../../../utility/image";
+import GameWonLostModal from "../../modal/GameWonLostModal";
+import PageMeta from "../../utility/PageMeta";
 import { GameBoard } from "./GameLogic";
 import PreviewModal from "./PreviewModal";
 import { SlidePuzzleSettingModal } from "./SettingModal";

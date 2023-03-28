@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import PageMeta from "../PageMeta";
+import PageMeta from "../../utility/PageMeta";
 import { WordleLogic } from "./GameLogic";
 import { KeyBoard, KeyBoardResponse } from "./KeyBoard";
 import { WorldLetter } from "./WordleLetter";
-import { useDictionaryApi, isWordValid } from "../../utility/word";
-import GameWonLostModal from "../GameWonLostModal";
-import useEvent from "../../hooks/useEvent";
+import { useDictionaryApi, isWordValid } from "../../../utility/word";
+import GameWonLostModal from "../../modal/GameWonLostModal";
+import useEvent from "../../../hooks/useEvent";
 
 export interface IWordleGameBoardProps {}
 

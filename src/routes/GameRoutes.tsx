@@ -1,16 +1,18 @@
 import { lazy, Suspense } from "react";
 import { RouteObject } from "react-router-dom";
-import LoadingGame from "../layout/LoadingGame";
-import ErrorPage from "../layout/ErrorPage";
+import LoadingGame from "../layout/components/LoadingGame";
+import ErrorPage from "../layout/error/ErrorPage";
 import GameLayout from "../layout/GameLayout";
-import Hero from "../layout/Hero";
-import GameError from "../layout/GameError";
+import Hero from "../components/hero/Hero";
+import GameError from "../layout/error/GameError";
 
-const GameBoard = lazy(() => import("../components/2048/GameBoard"));
+const GameBoard = lazy(() => import("../components/games/2048/GameBoard"));
 const SlidePuzzleBoard = lazy(
-  () => import("../components/slidePuzzle/GameBoard")
+  () => import("../components/games/slidePuzzle/GameBoard")
 );
-const WordleGameBoard = lazy(() => import("../components/wordle/GameBoard"));
+const WordleGameBoard = lazy(
+  () => import("../components/games/wordle/GameBoard")
+);
 const GameBoardWithFallback = () => (
   <Suspense fallback={<LoadingGame />}>
     <GameBoard />

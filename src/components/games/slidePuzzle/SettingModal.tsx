@@ -1,8 +1,8 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useRef, useState } from "react";
-import useAutosizeTextArea from "../../hooks/useAutosizeTextarea";
-import { classNames } from "../../utility/css";
-import { verifyImageUrl } from "../../utility/image";
+import useAutosizeTextArea from "../../../hooks/useAutosizeTextarea";
+import { classNames } from "../../../utility/css";
+import { verifyImageUrl } from "../../../utility/image";
 
 export interface ISlidePuzzleSettingModalProps {
   isOpen: boolean;

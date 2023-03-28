@@ -1,4 +1,4 @@
-import GithubLogo from "../assets/icons/GithubLogo";
+import GithubLogo from "../../assets/icons/GithubLogo";
 
 export default function Footer() {
   return (

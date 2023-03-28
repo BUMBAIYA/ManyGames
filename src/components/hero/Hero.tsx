@@ -1,9 +1,9 @@
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { GameCardPropsType } from "./components/GameCard";
-import PageMeta from "../components/PageMeta";
+import { GameCardPropsType } from "./GameCard";
+import PageMeta from "../utility/PageMeta";
 
-const GameCard = lazy(() => import("./components/GameCard"));
+const GameCard = lazy(() => import("./GameCard"));
 
 const GameCardFallback: React.FC<GameCardPropsType> = (props) => {
   return (

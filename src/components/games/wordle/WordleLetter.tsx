@@ -1,4 +1,4 @@
-import { classNames } from "../../utility/css";
+import { classNames } from "../../../utility/css";
 
 export interface IWorldLetterProps {
   value: string | null;

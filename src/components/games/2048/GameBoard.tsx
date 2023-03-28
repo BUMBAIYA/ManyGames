@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Board } from "./GameLogic";
-import useEvent from "../../hooks/useEvent";
+import useEvent from "../../../hooks/useEvent";
 import GameTile from "./GameTile";
 import GameDetails from "./GameDetails";
 import "../../styles/scss/2048.scss";
-import GameWonLostModal from "../GameWonLostModal";
-import useLocalStorage from "../../hooks/useLocalStorage";
-import PageMeta from "../PageMeta";
+import GameWonLostModal from "../../modal/GameWonLostModal";
+import useLocalStorage from "../../../hooks/useLocalStorage";
+import PageMeta from "../../utility/PageMeta";
 
 type GameBoardProps = {
   size?: number;

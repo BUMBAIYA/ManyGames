@@ -1,7 +1,7 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef } from "react";
-import { classNames } from "../../utility/css";
-import { dragElement } from "../../utility/dragElement";
+import { classNames } from "../../../utility/css";
+import { dragElement } from "../../../utility/dragElement";
 
 export interface IPreviewModalProps {
   isOpen: boolean;
