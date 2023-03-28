@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import Logo from "../assets/icons/Logo";
-import Navbar from "./components/Navbar";
-import { SidebarNavLink } from "./components/SidebarNavLink";
+import Logo from "../../assets/icons/Logo";
+import Navbar from "../components/Navbar";
+import { SidebarNavLink } from "../components/SidebarNavLink";
 
 export default function Header() {
   return (
