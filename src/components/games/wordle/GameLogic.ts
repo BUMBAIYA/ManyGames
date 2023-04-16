@@ -46,12 +46,6 @@ export class WordleLogic {
     else return false;
   }
 
-  checkWord() {
-    let out: boolean[] = [];
-    out.push(false, true, false, false, false);
-    return false;
-  }
-
   onEnter() {
     if (this.cursorAt === 0) return;
     if (
@@ -66,10 +60,12 @@ export class WordleLogic {
           this.correctWord[cIndex].toLocaleLowerCase()
         ) {
           tempLetter.status = "CORRECT";
+          this.won = this.won ? true : false;
         } else if (
           this.correctWord.includes(tempLetter.value?.toLocaleLowerCase()!)
         ) {
           tempLetter.status = "ALMOST";
+          this.won = false;
         } else {
           tempLetter.status = "WRONG";
           this.won = false;
