@@ -1,12 +1,13 @@
 {
-  "name": "game",
+  "name": "manygames",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "husky install"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.11",
@@ -24,6 +25,8 @@
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^3.0.0",
     "autoprefixer": "^10.4.13",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
     "postcss": "^8.4.20",
     "prettier": "^2.8.1",
     "prettier-plugin-tailwindcss": "^0.2.1",
