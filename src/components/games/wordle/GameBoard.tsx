@@ -3,9 +3,9 @@ import PageMeta from "../../utility/PageMeta";
 import { WordleLogic } from "./GameLogic";
 import { KeyBoard, KeyBoardResponse } from "./KeyBoard";
 import { WorldLetter } from "./WordleLetter";
-import { useDictionaryApi, isWordValid } from "../../../utility/word";
+import { useDictionaryApi } from "../../../utility/word";
 import GameWonLostModal from "../../modal/GameWonLostModal";
-import useEvent from "../../../hooks/useEvent";
+import { useEventListener } from "../../../hooks/useEventListener";
 
 export interface IWordleGameBoardProps {}
 
@@ -14,7 +14,7 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
   const [openModal, setOpenModal] = useState<boolean>(true);
   const [board, setBoard] = useState(new WordleLogic("hello"));
   const [wordMeaning, setWordMeaning] = useState<string>(
-    "used as a greeting or to begin a phone conversation"
+    "used as a greeting or to begin a phone conversation",
   );
   const [wrongWordGuessed, setWrongWordGuessed] = useState<string[]>([]);
 
@@ -56,7 +56,7 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
   const createDeepClone = () => {
     const boardClone: WordleLogic = Object.assign(
       Object.create(Object.getPrototypeOf(board)),
-      board
+      board,
     );
     return boardClone;
   };
@@ -109,7 +109,7 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
     }
   };
 
-  useEvent(document.body, "keydown", handleKeyDown, false);
+  useEventListener("keydown", handleKeyDown, document.body, false);
 
   useEffect(() => {
     getInitialRandomWord();
@@ -169,7 +169,7 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
                 "
                 {wordMeaning.replace(
                   wordMeaning[0],
-                  wordMeaning[0].toLocaleUpperCase()
+                  wordMeaning[0].toLocaleUpperCase(),
                 )}
                 "
               </span>

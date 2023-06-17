@@ -7,16 +7,14 @@ import { useEffect } from "react";
 import useLocalStorage from "../../hooks/useLocalStorage";
 
 export default function ThemeSwitchButton() {
-  const [theme, setTheme] = useLocalStorage<string>("theme", "light");
+  const [theme, setTheme] = useLocalStorage<"dark" | "light">("theme", "light");
   const handleToggle = () => {
-    document.documentElement.classList.toggle("dark");
-    if (theme === "light") setTheme("dark");
-    else setTheme("light");
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
   useEffect(() => {
     document.documentElement.setAttribute("class", theme);
-  }, []);
+  }, [theme]);
 
   return (
     <div className="flex gap-4">

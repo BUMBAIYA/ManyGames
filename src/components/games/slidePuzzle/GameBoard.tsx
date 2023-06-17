@@ -4,7 +4,6 @@ import {
   EyeSlashIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
-import useEvent from "../../../hooks/useEvent";
 import useLocalStorage from "../../../hooks/useLocalStorage";
 import { classNames } from "../../../utility/css";
 import { splitImageToTiles, verifyImageUrl } from "../../../utility/image";
@@ -13,6 +12,7 @@ import PageMeta from "../../utility/PageMeta";
 import { GameBoard } from "./GameLogic";
 import PreviewModal from "./PreviewModal";
 import { SlidePuzzleSettingModal } from "./SettingModal";
+import { useEventListener } from "../../../hooks/useEventListener";
 
 export interface IPuzzleProps {}
 
@@ -25,10 +25,10 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     {
       col: 7,
       row: 5,
-    }
+    },
   );
   const [board, setBoard] = useState(
-    new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row)
+    new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row),
   );
   const [imageUrl, setImageUrl] = useState<string>("/assets/puzzle.jpg");
   const [imageTiles, setImageTiles] = useState<string[]>([]);
@@ -38,7 +38,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   const [loadingBoard, setLoadingBoard] = useState<boolean>(true);
   const [lowestMoves, setLowestMoves] = useLocalStorage<number>(
     "slidepuzzle-lowestmoves",
-    0
+    0,
   );
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
           imageUrl,
           canvasRef,
           boardTileDimenstion.row,
-          boardTileDimenstion.col
+          boardTileDimenstion.col,
         );
         setImageTiles(tileImages);
       } else {
@@ -60,7 +60,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
             "Error! Check Internet connection or reload page";
           refLoadingError.current.style.color = "red";
           refLoadingError.current.previousElementSibling?.classList.toggle(
-            "hidden"
+            "hidden",
           );
         }
       }
@@ -80,7 +80,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     if (event.repeat) return;
     let boardClone: GameBoard = Object.assign(
       Object.create(Object.getPrototypeOf(board)),
-      board
+      board,
     );
     switch (event.key) {
       case "ArrowUp": {
@@ -113,7 +113,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     }
   };
 
-  useEvent(document.body, "keydown", handleKeyDown, false);
+  useEventListener("keydown", handleKeyDown, document.body, false);
 
   const handleResetGame = () => {
     setBoard(new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row));
@@ -157,7 +157,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
           <div
             className={classNames(
               board.hasWon() ? "" : "gap-1",
-              "grid w-full max-w-3xl select-none rounded-md bg-zinc-900 p-1 dark:bg-emerald-800"
+              "grid w-full max-w-3xl select-none rounded-md bg-zinc-900 p-1 dark:bg-emerald-800",
             )}
             style={{
               gridTemplateColumns: `repeat(${boardTileDimenstion.col}, minmax(0, 1fr))`,
@@ -183,7 +183,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
                   key={index}
                   className={classNames(
                     board.hasWon() ? "" : "rounded-sm",
-                    "h-full w-full bg-cover bg-no-repeat"
+                    "h-full w-full bg-cover bg-no-repeat",
                   )}
                 ></img>
               );
