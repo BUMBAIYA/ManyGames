@@ -13,7 +13,7 @@ export function splitImageToTiles(
   imageUrl: string,
   canvasRef: RefObject<HTMLCanvasElement>,
   row: number,
-  col: number
+  col: number,
 ): Promise<string[]> {
   return new Promise((resolve) => {
     const canvas = canvasRef.current!;

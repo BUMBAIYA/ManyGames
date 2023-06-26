@@ -23,7 +23,7 @@ export default function PreviewModal(props: IPreviewModalProps) {
       ref={divRef}
       className={classNames(
         props.isOpen ? "animate-show" : "hidden",
-        "absolute top-20 left-4 z-[80] w-full min-w-[300px] max-w-md overflow-hidden rounded-xl border border-zinc-200 dark:border-emerald-900"
+        "absolute top-20 left-4 z-[80] w-full min-w-[300px] max-w-md overflow-hidden rounded-xl border border-zinc-200 dark:border-emerald-900",
       )}
     >
       <div className="transform  bg-white p-4 text-left align-middle shadow-md transition-all dark:bg-zinc-800  sm:p-6">

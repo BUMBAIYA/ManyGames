@@ -159,7 +159,7 @@ export class Board {
     var hasChanged = false;
     for (var rowIndex = 0; rowIndex < this.boardSize; ++rowIndex) {
       var currentRow = this.cells[rowIndex].filter(
-        (_tile) => _tile.value !== 0
+        (_tile) => _tile.value !== 0,
       );
       var resultRow: GameTile[] = [];
       for (var targetIndex = 0; targetIndex < this.boardSize; ++targetIndex) {

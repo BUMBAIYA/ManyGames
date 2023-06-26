@@ -1,6 +1,6 @@
 export function dragElement(
   draggableElement: HTMLElement,
-  grabElement?: HTMLElement
+  grabElement?: HTMLElement,
 ) {
   if (draggableElement === null) {
     console.error("Ref to draggable element is null");

@@ -16,7 +16,7 @@ export class GameBoard {
     }
     this.shuffle();
     this.emptyBoxIndex = this.tiles.findIndex(
-      (_tile) => _tile === _col * _row - 1
+      (_tile) => _tile === _col * _row - 1,
     );
   }
 

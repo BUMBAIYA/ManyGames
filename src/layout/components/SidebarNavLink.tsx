@@ -58,7 +58,7 @@ export function SidebarNavLink(props: ISidebarNavLinkProps) {
                         isActive
                           ? "border-l-2 border-l-emerald-400 text-zinc-900 dark:text-emerald-600"
                           : "text-zinc-600 dark:text-zinc-400",
-                        "flex justify-between gap-2 py-1 pr-3 pl-4 text-sm transition hover:text-zinc-900 dark:hover:text-white"
+                        "flex justify-between gap-2 py-1 pr-3 pl-4 text-sm transition hover:text-zinc-900 dark:hover:text-white",
                       )
                     }
                     onClick={() => {

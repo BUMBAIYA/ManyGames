@@ -8,10 +8,10 @@ import GameError from "../layout/error/GameError";
 
 const GameBoard = lazy(() => import("../components/games/2048/GameBoard"));
 const SlidePuzzleBoard = lazy(
-  () => import("../components/games/slidePuzzle/GameBoard")
+  () => import("../components/games/slidePuzzle/GameBoard"),
 );
 const WordleGameBoard = lazy(
-  () => import("../components/games/wordle/GameBoard")
+  () => import("../components/games/wordle/GameBoard"),
 );
 const GameBoardWithFallback = () => (
   <Suspense fallback={<LoadingGame />}>

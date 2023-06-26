@@ -11,7 +11,7 @@ export interface IGameWonLostModalProps<T> {
 }
 
 export default function GameWonLostModal<T extends ReactNode>(
-  props: IGameWonLostModalProps<T>
+  props: IGameWonLostModalProps<T>,
 ) {
   return (
     <Transition appear show={props.isOpen} as={Fragment}>

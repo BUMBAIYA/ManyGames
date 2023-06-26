@@ -15,7 +15,7 @@ export default function Navbar() {
     inMin: number,
     inMax: number,
     outMin: number,
-    outMax: number
+    outMax: number,
   ) {
     return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
   }
@@ -25,11 +25,11 @@ export default function Navbar() {
     if (scrolledHeight < 60) {
       navRef.current?.style.setProperty(
         "--bg-opacity-light",
-        "" + scale(scrolledHeight, 1, 59, 0.4, 0.9)
+        "" + scale(scrolledHeight, 1, 59, 0.4, 0.9),
       );
       navRef.current?.style.setProperty(
         "--bg-opacity-dark",
-        "" + scale(scrolledHeight, 1, 59, 0.2, 0.8)
+        "" + scale(scrolledHeight, 1, 59, 0.2, 0.8),
       );
     }
   };

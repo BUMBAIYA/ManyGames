@@ -17,7 +17,7 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
   const [openWonModal, setOpenWonModal] = useState<boolean>(true);
   const [highScore, setHighScore] = useLocalStorage<number>(
     "2048-highscore",
-    0
+    0,
   );
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -29,7 +29,7 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
     if (board.hasLost()) return;
     let boardClone: Board = Object.assign(
       Object.create(Object.getPrototypeOf(board)),
-      board
+      board,
     );
     switch (event.key) {
       case "ArrowUp": {

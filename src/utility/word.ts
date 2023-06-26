@@ -24,12 +24,12 @@ export const useDictionaryApi = () => {
           if (word === "" || word === null) {
             reslove(null);
             throw new Error(
-              "isWordValid: paramer word is possibly empty or null"
+              "isWordValid: paramer word is possibly empty or null",
             );
           }
           try {
             const data: dictionaryAPIResponse = await fetch(
-              `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+              `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
             ).then((res) => res.json());
             if (data === undefined) {
               reslove(null);
@@ -58,13 +58,13 @@ export const useDictionaryApi = () => {
           } catch (error) {
             resolve("hello");
             throw new Error(
-              "Unable to load word-bank file check internet connection"
+              "Unable to load word-bank file check internet connection",
             );
           }
         });
       },
     }),
-    []
+    [],
   );
 
   return dictionaryapi;

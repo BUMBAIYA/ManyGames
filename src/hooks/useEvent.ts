@@ -4,12 +4,12 @@ type EventType = keyof HTMLElementEventMap;
 
 export default function useEvent<
   T extends HTMLElement | HTMLElement,
-  K extends EventType
+  K extends EventType,
 >(
   ref: RefObject<T> | HTMLElement,
   eventName: K,
   handler: (event: HTMLElementEventMap[K]) => void,
-  options?: boolean | AddEventListenerOptions
+  options?: boolean | AddEventListenerOptions,
 ) {
   useEffect(() => {
     const node = "current" in ref ? ref.current : ref;

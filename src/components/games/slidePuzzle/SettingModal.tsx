@@ -19,7 +19,7 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
   const textareaImageUrl = useRef<HTMLTextAreaElement>(null);
   const [imageUrl, setImageUrl] = useState<string>(props.imageUrl);
   const [verifiedImageUrl, setVerifiedImageUrl] = useState<string>(
-    props.imageUrl
+    props.imageUrl,
   );
   const [puzzleCol, setPuzzleCol] = useState<number>(props.col);
   const [puzzleRow, setPuzzleRow] = useState<number>(props.row);
@@ -168,7 +168,7 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
                 <div
                   className={classNames(
                     showVerifyImage ? "mt-4" : "mt-12",
-                    "flex justify-end gap-2"
+                    "flex justify-end gap-2",
                   )}
                 >
                   <button

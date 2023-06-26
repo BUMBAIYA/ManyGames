@@ -16,7 +16,7 @@ export function WorldLetter(props: IWorldLetterProps) {
           : "",
         props.status === "ALMOST" ? "bg-yellow-300 dark:bg-yellow-600" : "",
         props.status === "WRONG" ? "bg-gray-400 dark:bg-gray-500" : "",
-        "flex h-14 w-14 animate-show items-center justify-center rounded-md border border-solid border-emerald-600 text-2xl font-bold text-zinc-900 dark:border-emerald-700 dark:bg-zinc-900 dark:text-white md:h-16 md:w-16 md:text-3xl"
+        "flex h-14 w-14 animate-show items-center justify-center rounded-md border border-solid border-emerald-600 text-2xl font-bold text-zinc-900 dark:border-emerald-700 dark:bg-zinc-900 dark:text-white md:h-16 md:w-16 md:text-3xl",
       )}
       style={
         props.status === "WRONG"

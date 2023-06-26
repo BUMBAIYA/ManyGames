@@ -24,7 +24,7 @@ export default function GameCard(props: GameCardPropsType) {
             }
           });
         },
-        { rootMargin: "50px" }
+        { rootMargin: "50px" },
       );
       observer.observe(imgRef.current);
       return () => {

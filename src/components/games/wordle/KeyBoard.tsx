@@ -28,7 +28,7 @@ export function KeyBoard(props: IKeyBoardProps) {
         key={props.value}
         className={classNames(
           props.isDisable ? "bg-gray-300" : "",
-          "flex cursor-pointer items-center justify-center rounded-md border border-emerald-600 bg-emerald-100 p-2 text-xs font-medium text-emerald-600 hover:bg-emerald-200 hover:text-emerald-800 dark:border-emerald-700 dark:bg-emerald-400/20 dark:text-white dark:hover:bg-emerald-400/40 sm:rounded-lg sm:px-3 sm:py-2 sm:text-base md:py-1 lg:px-4 lg:py-1 lg:text-xl"
+          "flex cursor-pointer items-center justify-center rounded-md border border-emerald-600 bg-emerald-100 p-2 text-xs font-medium text-emerald-600 hover:bg-emerald-200 hover:text-emerald-800 dark:border-emerald-700 dark:bg-emerald-400/20 dark:text-white dark:hover:bg-emerald-400/40 sm:rounded-lg sm:px-3 sm:py-2 sm:text-base md:py-1 lg:px-4 lg:py-1 lg:text-xl",
         )}
         onClick={() => handleSubmitKey(props.value)}
       >
