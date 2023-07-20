@@ -70,7 +70,7 @@ export default function GameBoard() {
 
   useEvent(document.body, "keydown", handleKeyDown, false);
 
-  const handlers = useSwipeable({
+  const touchSwipeHandlers = useSwipeable({
     onSwipedUp: () => {
       handleMoveTile(MoveDirection.UP);
     },
@@ -83,7 +83,7 @@ export default function GameBoard() {
     onSwipedLeft: () => {
       handleMoveTile(MoveDirection.LEFT);
     },
-    swipeDuration: 400,
+    swipeDuration: 500,
     preventScrollOnSwipe: true,
     trackMouse: true,
   });
@@ -121,9 +121,9 @@ export default function GameBoard() {
   };
 
   return (
-    <div className="flex flex-col-reverse items-center gap-8 md:flex-row md:items-start md:justify-center">
+    <div className="flex select-none flex-col-reverse items-center gap-8 md:flex-row md:items-start md:justify-center">
       <PageMeta title="ManyGames | 2048" description="Play 2048 online" />
-      <div className="relative" {...handlers}>
+      <div className="relative" {...touchSwipeHandlers}>
         <div className="flex flex-col gap-1 sm:gap-2">{cells}</div>
         {tiles}
       </div>

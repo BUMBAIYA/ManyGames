@@ -3,6 +3,7 @@ import { Fragment, useRef, useState } from "react";
 import useAutosizeTextArea from "../../../hooks/useAutosizeTextarea";
 import { classNames } from "../../../utility/css";
 import { verifyImageUrl } from "../../../utility/image";
+import { DEFAULT_SLIDEPUZZLE_IMG_URL } from "./GameBoard";
 
 export interface ISlidePuzzleSettingModalProps {
   isOpen: boolean;
@@ -14,7 +15,6 @@ export interface ISlidePuzzleSettingModalProps {
 }
 
 export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
-  const DEFAULT_IMG_URL = "/assets/puzzle.jpg";
   const imageErrorP = useRef<HTMLParagraphElement>(null);
   const textareaImageUrl = useRef<HTMLTextAreaElement>(null);
   const [imageUrl, setImageUrl] = useState<string>(props.imageUrl);
@@ -50,7 +50,7 @@ export function SlidePuzzleSettingModal(props: ISlidePuzzleSettingModalProps) {
         imageErrorP.current.innerHTML =
           "Incorrect Image Url default image loaded";
         imageErrorP.current.style.color = "red";
-        setVerifiedImageUrl(DEFAULT_IMG_URL);
+        setVerifiedImageUrl(DEFAULT_SLIDEPUZZLE_IMG_URL);
         setShowVerifyImage(true);
         return;
       } else {

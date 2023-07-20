@@ -1,3 +1,4 @@
+import { useSwipeable } from "react-swipeable";
 import {
   ArrowPathIcon,
   EyeIcon,
@@ -13,6 +14,17 @@ import { GameBoard } from "./GameLogic";
 import PreviewModal from "./PreviewModal";
 import { SlidePuzzleSettingModal } from "./SettingModal";
 import { useEventListener } from "../../../hooks/useEventListener";
+
+enum MoveDirection {
+  UP = 1,
+  DOWN = 3,
+  RIGHT = 2,
+  LEFT = 4,
+}
+
+export const DEFAULT_SLIDEPUZZLE_IMG_URL = import.meta.env.PROD
+  ? "https://manygames.vercel.app/assets/puzzle.jpg"
+  : "/assets/puzzle.jpg";
 
 export interface IPuzzleProps {}
 
@@ -30,7 +42,10 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   const [board, setBoard] = useState(
     new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row),
   );
-  const [imageUrl, setImageUrl] = useState<string>("/assets/puzzle.jpg");
+  const [imageUrl, setImageUrl] = useLocalStorage<string>(
+    "slidepuzzle-imageUrl",
+    DEFAULT_SLIDEPUZZLE_IMG_URL,
+  );
   const [imageTiles, setImageTiles] = useState<string[]>([]);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
@@ -40,6 +55,16 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     "slidepuzzle-lowestmoves",
     0,
   );
+
+  const getClonedBoard = (): GameBoard => {
+    return Object.assign(Object.create(Object.getPrototypeOf(board)), board);
+  };
+
+  const handleMoveTile = (dir: MoveDirection) => {
+    let newBoard = getClonedBoard().moveTile(dir);
+    if (newBoard == null) return;
+    setBoard(newBoard);
+  };
 
   useEffect(() => {
     setLoadingBoard(true);
@@ -78,33 +103,22 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     if (event.keyCode > 40 || event.keyCode < 37) return;
     event.preventDefault();
     if (event.repeat) return;
-    let boardClone: GameBoard = Object.assign(
-      Object.create(Object.getPrototypeOf(board)),
-      board,
-    );
+
     switch (event.key) {
       case "ArrowUp": {
-        let newBoard = boardClone.moveTile(1);
-        if (newBoard == null) break;
-        setBoard(newBoard);
+        handleMoveTile(MoveDirection.UP);
         break;
       }
       case "ArrowDown": {
-        let newBoard = boardClone.moveTile(3);
-        if (newBoard == null) break;
-        setBoard(newBoard);
+        handleMoveTile(MoveDirection.DOWN);
         break;
       }
       case "ArrowRight": {
-        let newBoard = boardClone.moveTile(2);
-        if (newBoard == null) break;
-        setBoard(newBoard);
+        handleMoveTile(MoveDirection.RIGHT);
         break;
       }
       case "ArrowLeft": {
-        let newBoard = boardClone.moveTile(4);
-        if (newBoard == null) break;
-        setBoard(newBoard);
+        handleMoveTile(MoveDirection.LEFT);
         break;
       }
       default: {
@@ -114,6 +128,24 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   };
 
   useEventListener("keydown", handleKeyDown, document.body, false);
+
+  const touchSwipeHandlers = useSwipeable({
+    onSwipedUp: () => {
+      handleMoveTile(MoveDirection.UP);
+    },
+    onSwipedDown: () => {
+      handleMoveTile(MoveDirection.DOWN);
+    },
+    onSwipedRight: () => {
+      handleMoveTile(MoveDirection.RIGHT);
+    },
+    onSwipedLeft: () => {
+      handleMoveTile(MoveDirection.LEFT);
+    },
+    swipeDuration: 500,
+    preventScrollOnSwipe: true,
+    trackMouse: true,
+  });
 
   const handleResetGame = () => {
     setBoard(new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row));
@@ -155,9 +187,10 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
         )}
         {!loadingBoard && (
           <div
+            {...touchSwipeHandlers}
             className={classNames(
-              board.hasWon() ? "" : "gap-1",
-              "grid w-full max-w-3xl select-none rounded-md bg-zinc-900 p-1 dark:bg-emerald-800",
+              board.hasWon() ? "" : "gap-[2px] sm:gap-1",
+              "grid w-full max-w-3xl select-none rounded-sm bg-zinc-900 p-[2px] dark:bg-emerald-800 sm:rounded-md sm:p-1",
             )}
             style={{
               gridTemplateColumns: `repeat(${boardTileDimenstion.col}, minmax(0, 1fr))`,
@@ -183,15 +216,15 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
                   key={index}
                   className={classNames(
                     board.hasWon() ? "" : "rounded-sm",
-                    "h-full w-full bg-cover bg-no-repeat",
+                    "pointer-events-none h-full w-full select-none bg-cover bg-no-repeat",
                   )}
-                ></img>
+                />
               );
             })}
           </div>
         )}
-        <div className="flex w-full items-center justify-between gap-4 lg:w-auto lg:flex-col">
-          <div className="flex flex-row gap-2 lg:flex-col">
+        <div className="flex w-full flex-col items-center justify-between gap-4 sm:flex-row lg:w-auto lg:flex-col">
+          <div className="flex w-full flex-row gap-2 lg:flex-col">
             <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 lg:w-full">
               <span className="text-xs sm:text-base">Moves</span>
               <p className="text-base font-semibold sm:text-3xl">
@@ -199,13 +232,13 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
               </p>
             </div>
             <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20">
-              <span className="text-xs sm:text-base">LOWEST MOVES</span>
+              <span className="text-xs sm:text-base">Lowest moves</span>
               <p className="text-base font-semibold sm:text-3xl">
                 {lowestMoves}
               </p>
             </div>
           </div>
-          <div className="flex w-auto items-center gap-2 lg:w-full lg:flex-col">
+          <div className="flex w-full items-center justify-end gap-2 lg:w-full lg:flex-col">
             <button
               className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
               onClick={() => setOpenPreviewModal((prev) => !prev)}
