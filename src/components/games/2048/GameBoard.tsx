@@ -6,6 +6,7 @@ import GameDetails from "./GameDetails";
 import GameWonLostModal from "../../modal/GameWonLostModal";
 import useLocalStorage from "../../../hooks/useLocalStorage";
 import PageMeta from "../../utility/PageMeta";
+import { useSwipeable } from "react-swipeable";
 import "../../../styles/scss/2048.scss";
 
 type GameBoardProps = {
@@ -20,6 +21,32 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
     0,
   );
 
+  const getClonedBoard = (): Board => {
+    return Object.assign(Object.create(Object.getPrototypeOf(board)), board);
+  };
+
+  const handleMoveUp = () => {
+    setBoard(getClonedBoard().move(1));
+  };
+
+  const handleMoveDown = () => {
+    setBoard(getClonedBoard().move(3));
+  };
+
+  const handleMoveRight = () => {
+    setBoard(getClonedBoard().move(2));
+  };
+
+  const handleMoveLeft = () => {
+    setBoard(getClonedBoard().move(0));
+  };
+
+  const handleHighScore = () => {
+    if (board.score > highScore) {
+      setHighScore(board.score);
+    }
+  };
+
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.currentTarget !== document.activeElement) return;
     if (event.keyCode > 40 || event.keyCode < 37) return;
@@ -27,41 +54,48 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
     if (event.repeat) return;
     if (board.hasWon()) return;
     if (board.hasLost()) return;
-    let boardClone: Board = Object.assign(
-      Object.create(Object.getPrototypeOf(board)),
-      board,
-    );
     switch (event.key) {
       case "ArrowUp": {
-        let newBoard = boardClone.move(1);
-        setBoard(newBoard);
+        handleMoveUp();
         break;
       }
       case "ArrowDown": {
-        let newBoard = boardClone.move(3);
-        setBoard(newBoard);
+        handleMoveDown();
         break;
       }
       case "ArrowRight": {
-        let newBoard = boardClone.move(2);
-        setBoard(newBoard);
+        handleMoveRight();
         break;
       }
       case "ArrowLeft": {
-        let newBoard = boardClone.move(0);
-        setBoard(newBoard);
+        handleMoveLeft();
         break;
       }
       default: {
         return;
       }
     }
-    if (board.score > highScore) {
-      setHighScore(board.score);
-    }
   };
 
   useEvent(document.body, "keydown", handleKeyDown, false);
+
+  const handlers = useSwipeable({
+    onSwipedUp: () => {
+      handleMoveUp();
+    },
+    onSwipedDown: () => {
+      handleMoveDown();
+    },
+    onSwipedRight: () => {
+      handleMoveRight();
+    },
+    onSwipedLeft: () => {
+      handleMoveLeft();
+    },
+    swipeDuration: 400,
+    preventScrollOnSwipe: true,
+    trackMouse: true,
+  });
 
   const cells = board.cells.map((row, rowIndex) => {
     return (
@@ -89,6 +123,7 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
   };
 
   const handleCloseWonModal = () => {
+    handleHighScore();
     setOpenWonModal(false);
     handleResetGame();
     setOpenWonModal(true);
@@ -97,7 +132,7 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
   return (
     <div className="flex flex-col-reverse items-center gap-8 md:flex-row md:items-start md:justify-center">
       <PageMeta title="ManyGames | 2048" description="Play 2048 online" />
-      <div className="relative">
+      <div className="relative" {...handlers}>
         <div className="flex flex-col gap-1 sm:gap-2">{cells}</div>
         {tiles}
       </div>
