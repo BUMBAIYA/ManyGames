@@ -74,7 +74,7 @@ export class Board {
   deltaY: number[];
   won: boolean;
 
-  constructor(_size: number = 4) {
+  constructor(_size: number | undefined = 4) {
     this.boardSize = _size;
     this.tiles = [];
     this.cells = [];

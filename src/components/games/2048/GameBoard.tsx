@@ -9,12 +9,15 @@ import PageMeta from "../../utility/PageMeta";
 import { useSwipeable } from "react-swipeable";
 import "../../../styles/scss/2048.scss";
 
-type GameBoardProps = {
-  size?: number;
-};
+enum MoveDirection {
+  UP = 1,
+  DOWN = 3,
+  RIGHT = 2,
+  LEFT = 0,
+}
 
-export default function GameBoard({ size = 4 }: GameBoardProps) {
-  const [board, setBoard] = useState(new Board(size));
+export default function GameBoard() {
+  const [board, setBoard] = useState(new Board());
   const [openWonModal, setOpenWonModal] = useState<boolean>(true);
   const [highScore, setHighScore] = useLocalStorage<number>(
     "2048-highscore",
@@ -25,20 +28,8 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
     return Object.assign(Object.create(Object.getPrototypeOf(board)), board);
   };
 
-  const handleMoveUp = () => {
-    setBoard(getClonedBoard().move(1));
-  };
-
-  const handleMoveDown = () => {
-    setBoard(getClonedBoard().move(3));
-  };
-
-  const handleMoveRight = () => {
-    setBoard(getClonedBoard().move(2));
-  };
-
-  const handleMoveLeft = () => {
-    setBoard(getClonedBoard().move(0));
+  const handleMoveTile = (dir: MoveDirection) => {
+    setBoard(getClonedBoard().move(dir));
   };
 
   const handleHighScore = () => {
@@ -56,19 +47,19 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
     if (board.hasLost()) return;
     switch (event.key) {
       case "ArrowUp": {
-        handleMoveUp();
+        handleMoveTile(MoveDirection.UP);
         break;
       }
       case "ArrowDown": {
-        handleMoveDown();
+        handleMoveTile(MoveDirection.DOWN);
         break;
       }
       case "ArrowRight": {
-        handleMoveRight();
+        handleMoveTile(MoveDirection.RIGHT);
         break;
       }
       case "ArrowLeft": {
-        handleMoveLeft();
+        handleMoveTile(MoveDirection.LEFT);
         break;
       }
       default: {
@@ -81,16 +72,16 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
 
   const handlers = useSwipeable({
     onSwipedUp: () => {
-      handleMoveUp();
+      handleMoveTile(MoveDirection.UP);
     },
     onSwipedDown: () => {
-      handleMoveDown();
+      handleMoveTile(MoveDirection.DOWN);
     },
     onSwipedRight: () => {
-      handleMoveRight();
+      handleMoveTile(MoveDirection.RIGHT);
     },
     onSwipedLeft: () => {
-      handleMoveLeft();
+      handleMoveTile(MoveDirection.LEFT);
     },
     swipeDuration: 400,
     preventScrollOnSwipe: true,
@@ -119,7 +110,7 @@ export default function GameBoard({ size = 4 }: GameBoardProps) {
     });
 
   const handleResetGame = () => {
-    setBoard(new Board(size));
+    setBoard(new Board(4));
   };
 
   const handleCloseWonModal = () => {
