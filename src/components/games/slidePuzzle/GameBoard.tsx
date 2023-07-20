@@ -92,11 +92,11 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
       setLoadingBoard(!valid);
     }
     verifyImage();
-  }, [imageUrl, boardTileDimenstion]);
+  }, [imageUrl, boardTileDimenstion.row, boardTileDimenstion.col]);
 
   useEffect(() => {
     setBoard(new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row));
-  }, [boardTileDimenstion]);
+  }, [boardTileDimenstion.col, boardTileDimenstion.row]);
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.currentTarget !== document.activeElement) return;
