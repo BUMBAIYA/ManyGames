@@ -79,6 +79,7 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
       }
       if (event.repeat) return;
     }
+    if (board.wrongGuessedLetters.includes(event.key)) return;
     switch (event.key) {
       case "Enter": {
         const word = WordleLogic.getWord(board.testWord, board.currentAttempt);
@@ -144,7 +145,10 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
           );
         })}
       </div>
-      <KeyBoard getValue={handleKeyDown} />
+      <KeyBoard
+        getValue={handleKeyDown}
+        disabledKeys={board.wrongGuessedLetters}
+      />
       {(board.hasWon() || board.hasLost()) && (
         <GameWonLostModal
           isOpen={openModal}

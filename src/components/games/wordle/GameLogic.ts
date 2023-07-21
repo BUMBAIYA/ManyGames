@@ -10,6 +10,8 @@ export class WordleLogic {
   currentAttempt: number;
   totalAttempts: number;
   alphabetFound: string[];
+  wrongGuessedLetters: string[];
+  correctGuessedLetters: string[];
   cursorAt: number;
   won: boolean;
 
@@ -22,6 +24,8 @@ export class WordleLogic {
     this.alphabetFound = [];
     this.cursorAt = 0;
     this.won = false;
+    this.wrongGuessedLetters = [];
+    this.correctGuessedLetters = [];
     for (let rIndex = 0; rIndex < this.totalAttempts; rIndex++) {
       this.testWord[rIndex] = [];
       for (let cIndex = 0; cIndex < this.correctWordLength; cIndex++) {
@@ -60,6 +64,15 @@ export class WordleLogic {
           this.correctWord[cIndex].toLocaleLowerCase()
         ) {
           tempLetter.status = "CORRECT";
+          if (
+            !this.correctGuessedLetters.includes(
+              tempLetter.value.toLocaleLowerCase(),
+            )
+          ) {
+            this.correctGuessedLetters.push(
+              tempLetter.value.toLocaleLowerCase(),
+            );
+          }
           this.won = this.won ? true : false;
         } else if (
           this.correctWord.includes(tempLetter.value?.toLocaleLowerCase()!)
@@ -68,6 +81,17 @@ export class WordleLogic {
           this.won = false;
         } else {
           tempLetter.status = "WRONG";
+          if (tempLetter.value) {
+            if (
+              !this.wrongGuessedLetters.includes(
+                tempLetter.value.toLocaleLowerCase(),
+              )
+            ) {
+              this.wrongGuessedLetters.push(
+                tempLetter.value.toLocaleLowerCase(),
+              );
+            }
+          }
           this.won = false;
         }
       }
