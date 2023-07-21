@@ -6,12 +6,15 @@ import { WorldLetter } from "./WordleLetter";
 import { useDictionaryApi } from "../../../utility/word";
 import GameWonLostModal from "../../modal/GameWonLostModal";
 import { useEventListener } from "../../../hooks/useEventListener";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { BasicModal } from "../../modal/BasicModal";
 
 export interface IWordleGameBoardProps {}
 
 export default function WordleGameBoard(props: IWordleGameBoardProps) {
   const refNotValidText = useRef<HTMLDivElement>(null);
   const [openModal, setOpenModal] = useState<boolean>(true);
+  const [openInfoModal, setOpenInfoModal] = useState<boolean>(true);
   const [board, setBoard] = useState(new WordleLogic("hello"));
   const [wordMeaning, setWordMeaning] = useState<string>(
     "used as a greeting or to begin a phone conversation",
@@ -119,31 +122,44 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
   return (
     <div className="flex flex-col items-center gap-4 lg:gap-8">
       <PageMeta title="ManyGames | Wordle" description="Play online wordle" />
-      <div className="relative flex flex-col items-center gap-1 xl:gap-2">
-        <div
-          ref={refNotValidText}
-          style={{ animation: "1500ms linear 500ms hide" }}
-          className="absolute top-1/2 hidden rounded-md border border-gray-400 bg-white p-3 font-bold text-black"
-        >
-          Not a valid word
+      <div className="flex gap-4">
+        <div className="relative flex flex-col items-center gap-1 xl:gap-2">
+          <div
+            ref={refNotValidText}
+            style={{ animation: "1500ms linear 500ms hide" }}
+            className="absolute top-1/2 hidden rounded-md border border-gray-400 bg-white p-3 font-bold text-black"
+          >
+            Not a valid word
+          </div>
+          {board.testWord.map((row, rIndex) => {
+            return (
+              <div key={rIndex} className="flex flex-row gap-2">
+                {row.map((letter, cIndex) => {
+                  return (
+                    <WorldLetter
+                      key={rIndex * board.correctWordLength + cIndex}
+                      value={letter.value}
+                      status={letter.status}
+                      isActive={false}
+                      colIndex={cIndex}
+                    />
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
-        {board.testWord.map((row, rIndex) => {
-          return (
-            <div key={rIndex} className="flex flex-row gap-2">
-              {row.map((letter, cIndex) => {
-                return (
-                  <WorldLetter
-                    key={rIndex * board.correctWordLength + cIndex}
-                    value={letter.value}
-                    status={letter.status}
-                    isActive={false}
-                    colIndex={cIndex}
-                  />
-                );
-              })}
-            </div>
-          );
-        })}
+        <button className="h-6 w-6" onClick={() => setOpenInfoModal(true)}>
+          <InformationCircleIcon />
+        </button>
+        <BasicModal
+          title="How to play"
+          isOpen={openInfoModal}
+          closeModal={setOpenInfoModal}
+          className="max-w-xl"
+        >
+          <span>{/* TODO: Info here */}</span>
+        </BasicModal>
       </div>
       <KeyBoard
         getValue={handleKeyDown}
