@@ -8,6 +8,9 @@ import useLocalStorage from "../../../hooks/useLocalStorage";
 import PageMeta from "../../utility/PageMeta";
 import { useSwipeable } from "react-swipeable";
 
+import { BasicModal } from "../../modal/BasicModal";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+
 enum MoveDirection {
   UP = 1,
   DOWN = 3,
@@ -16,6 +19,7 @@ enum MoveDirection {
 }
 
 export default function GameBoard() {
+  const [openInfoModal, setOpenInfoModal] = useState<boolean>(false);
   const [board, setBoard] = useState(new Board());
   const [openWonModal, setOpenWonModal] = useState<boolean>(true);
   const [highScore, setHighScore] = useLocalStorage<number>(
@@ -126,11 +130,45 @@ export default function GameBoard() {
         <div className="flex flex-col gap-1 sm:gap-2">{cells}</div>
         {tiles}
       </div>
-      <GameDetails
-        score={board.score}
-        resetGame={handleResetGame}
-        highScore={highScore}
-      />
+      <div className="flex w-full flex-col gap-4 md:w-auto">
+        <div className="flex w-full justify-end">
+          <button
+            onClick={() => setOpenInfoModal(true)}
+            type="button"
+            className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
+            aria-label="How to play"
+          >
+            <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
+          </button>
+          <BasicModal
+            title="How to Play"
+            isOpen={openInfoModal}
+            closeModal={setOpenInfoModal}
+            className="max-w-xl"
+          >
+            <div className="mt-2 flex w-full flex-col justify-center gap-2 border-t border-emerald-500 p-4 text-black dark:text-white">
+              <span className="hidden w-full text-sm font-medium leading-relaxed lg:block">
+                You can use arrow keys or drag gesture or swipe on the game
+                board to move the tiles. Tiles with the same number merge into
+                one when they touch. Add them up to reach 2048!
+              </span>
+              <span className="block w-full text-sm font-medium leading-relaxed lg:hidden">
+                You can use drag gesture on the game board to move the tiles.
+                Tiles with the same number merge into one when they touch. Add
+                them up to reach 2048!
+              </span>
+            </div>
+          </BasicModal>
+        </div>
+        <div className="w-full">
+          <GameDetails
+            score={board.score}
+            resetGame={handleResetGame}
+            highScore={highScore}
+          />
+        </div>
+      </div>
+
       {board.hasWon() && (
         <GameWonLostModal
           isOpen={openWonModal}
