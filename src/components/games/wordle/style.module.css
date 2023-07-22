@@ -21,7 +21,7 @@
   }
 }
 
-@keyframes wrong-ziggle {
+@keyframes wrong_ziggle {
   0% {
     transform: translateX(0rem);
     background-color: red;

@@ -7,7 +7,6 @@ import GameWonLostModal from "../../modal/GameWonLostModal";
 import useLocalStorage from "../../../hooks/useLocalStorage";
 import PageMeta from "../../utility/PageMeta";
 import { useSwipeable } from "react-swipeable";
-import "./styles.scss";
 
 enum MoveDirection {
   UP = 1,

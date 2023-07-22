@@ -1,4 +1,5 @@
 import { classNames } from "../../../utility/css";
+import styles from "./style.module.css";
 
 export interface IWorldLetterProps {
   value: string | null;
@@ -21,10 +22,16 @@ export function WorldLetter(props: IWorldLetterProps) {
       style={
         props.status === "WRONG"
           ? {
-              animation: `200ms linear ${props.colIndex * 80}ms wrong-ziggle`,
+              animation: `200ms linear ${props.colIndex * 80}ms ${
+                styles.wrong_ziggle
+              }`,
             }
           : props.status === "CORRECT"
-          ? { animation: `800ms linear ${props.colIndex * 80}ms spinx` }
+          ? {
+              animation: `800ms linear ${props.colIndex * 80}ms ${
+                styles.spinx
+              }`,
+            }
           : {}
       }
     >

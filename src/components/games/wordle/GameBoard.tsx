@@ -8,7 +8,7 @@ import GameWonLostModal from "../../modal/GameWonLostModal";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { BasicModal } from "../../modal/BasicModal";
-import "./style.css";
+import styles from "./style.module.css";
 
 export interface IWordleGameBoardProps {}
 
@@ -127,7 +127,7 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
         <div className="relative flex flex-col items-center gap-1 xl:gap-2">
           <div
             ref={refNotValidText}
-            style={{ animation: "1500ms linear 500ms hide" }}
+            style={{ animation: `1500ms linear 500ms ${styles.hide}` }}
             className="absolute top-1/2 hidden rounded-md border border-gray-400 bg-white p-3 font-bold text-black"
           >
             Not a valid word

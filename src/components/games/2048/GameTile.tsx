@@ -1,4 +1,5 @@
 import { GameTile } from "./GameLogic";
+import styles from "./styles.module.scss";
 
 type NewTileProps = {
   tile: GameTile;
@@ -20,16 +21,21 @@ const colorss: any = {
 
 export default function NewTile({ tile }: NewTileProps) {
   let classArray: string[] = [
-    "tile inline-flex items-center justify-center font-bold w-[76px] h-[76px] rounded-md sm:w-32 sm:h-32 border border-emerald-600 dark:border-none text-3xl sm:text-5xl",
+    `${styles.tile} inline-flex items-center justify-center font-bold w-[76px] h-[76px] rounded-md sm:w-32 sm:h-32 border border-emerald-600 dark:border-none text-3xl sm:text-5xl`,
   ];
   classArray.push(colorss[tile.value]);
-  if (!tile.mergeToTile) classArray.push(`position_${tile.row}_${tile.column}`);
-  else classArray.push("merged");
-  if (tile.isNew()) classArray.push("new");
+  if (!tile.mergeToTile)
+    classArray.push(`${styles[`position_${tile.row}_${tile.column}`]}`);
+  else classArray.push(`${styles.merged}`);
+  if (tile.isNew()) classArray.push(`${styles.new}`);
   if (tile.hasMoved()) {
-    classArray.push(`row_from_${tile.fromRow()}_to_${tile.toRow()}`);
-    classArray.push(`column_from_${tile.fromColumn()}_to_${tile.toColumn()}`);
-    classArray.push("isMoving");
+    classArray.push(
+      `${styles[`row_from_${tile.fromRow()}_to_${tile.toRow()}`]}`,
+    );
+    classArray.push(
+      `${styles[`column_from_${tile.fromColumn()}_to_${tile.toColumn()}`]}`,
+    );
+    classArray.push(`${styles.isMoving}`);
   }
   let classes = classArray.join(" ");
   return <div className={classes}>{tile.value}</div>;
