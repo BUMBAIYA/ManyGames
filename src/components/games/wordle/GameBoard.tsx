@@ -15,7 +15,7 @@ export interface IWordleGameBoardProps {}
 export default function WordleGameBoard(props: IWordleGameBoardProps) {
   const refNotValidText = useRef<HTMLDivElement>(null);
   const [openModal, setOpenModal] = useState<boolean>(true);
-  const [openInfoModal, setOpenInfoModal] = useState<boolean>(true);
+  const [openInfoModal, setOpenInfoModal] = useState<boolean>(false);
   const [board, setBoard] = useState(new WordleLogic("hello"));
   const [wordMeaning, setWordMeaning] = useState<string>(
     "used as a greeting or to begin a phone conversation",
@@ -124,43 +124,78 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
     <div className="flex flex-col items-center gap-4 lg:gap-8">
       <PageMeta title="ManyGames | Wordle" description="Play online wordle" />
       <div className="flex gap-4">
-        <div className="relative flex flex-col items-center gap-1 xl:gap-2">
-          <div
-            ref={refNotValidText}
-            style={{ animation: `1500ms linear 500ms ${styles.hide}` }}
-            className="absolute top-1/2 hidden rounded-md border border-gray-400 bg-white p-3 font-bold text-black"
-          >
-            Not a valid word
+        <div className="flex flex-col-reverse gap-4 lg:flex-row">
+          <div className="relative flex flex-col items-center gap-1 xl:gap-2">
+            <div
+              ref={refNotValidText}
+              style={{ animation: `1500ms linear 500ms ${styles.hide}` }}
+              className="absolute top-1/2 hidden rounded-md border border-gray-400 bg-white p-3 font-bold text-black"
+            >
+              Not a valid word
+            </div>
+            {board.testWord.map((row, rIndex) => {
+              return (
+                <div key={rIndex} className="flex flex-row gap-2">
+                  {row.map((letter, cIndex) => {
+                    return (
+                      <WorldLetter
+                        key={rIndex * board.correctWordLength + cIndex}
+                        value={letter.value}
+                        status={letter.status}
+                        isActive={false}
+                        colIndex={cIndex}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })}
           </div>
-          {board.testWord.map((row, rIndex) => {
-            return (
-              <div key={rIndex} className="flex flex-row gap-2">
-                {row.map((letter, cIndex) => {
-                  return (
-                    <WorldLetter
-                      key={rIndex * board.correctWordLength + cIndex}
-                      value={letter.value}
-                      status={letter.status}
-                      isActive={false}
-                      colIndex={cIndex}
-                    />
-                  );
-                })}
+          <div className="flex w-full justify-end">
+            <button
+              onClick={() => setOpenInfoModal(true)}
+              type="button"
+              className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
+              aria-label="How to play"
+            >
+              <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
+            </button>
+            <BasicModal
+              title="Hints/ Clues"
+              isOpen={openInfoModal}
+              closeModal={setOpenInfoModal}
+              className="max-w-xl"
+            >
+              <div className="mt-2 flex w-full flex-col gap-2 border-t border-emerald-500 p-2 text-black dark:text-white">
+                <span className="text-sm font-thin">
+                  In Wordle, players have six attempts to guess a five-letter
+                  word selected by the game.
+                </span>
+                <div className="flex flex-row items-center gap-1 p-1">
+                  <span className="rounded-md border border-gray-700 bg-emerald-300 p-2 dark:border-white dark:bg-emerald-500"></span>
+                  <span>
+                    Indicates that the guessed letter is in the word and in the
+                    correct spot
+                  </span>
+                </div>
+                <div className="flex flex-row items-center gap-1 p-1">
+                  <span className="rounded-md border border-gray-700 bg-yellow-300 p-2 dark:border-white dark:bg-yellow-600"></span>
+                  <span>
+                    Indicates that the guessed letter is in the word but in the
+                    wrong spot
+                  </span>
+                </div>
+                <div className="flex flex-row items-center gap-1 p-1">
+                  <span className="rounded-md border border-gray-700 bg-gray-400 p-2 dark:border-white dark:bg-gray-500"></span>
+                  <span>
+                    Indicates that the guessed letter is not in the word in any
+                    spot
+                  </span>
+                </div>
               </div>
-            );
-          })}
+            </BasicModal>
+          </div>
         </div>
-        <button className="h-6 w-6" onClick={() => setOpenInfoModal(true)}>
-          <InformationCircleIcon />
-        </button>
-        <BasicModal
-          title="How to play"
-          isOpen={openInfoModal}
-          closeModal={setOpenInfoModal}
-          className="max-w-xl"
-        >
-          <span>{/* TODO: Info here */}</span>
-        </BasicModal>
       </div>
       <KeyBoard
         getValue={handleKeyDown}
