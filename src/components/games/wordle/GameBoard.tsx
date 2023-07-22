@@ -8,6 +8,7 @@ import GameWonLostModal from "../../modal/GameWonLostModal";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { BasicModal } from "../../modal/BasicModal";
+import "./style.css";
 
 export interface IWordleGameBoardProps {}
 
