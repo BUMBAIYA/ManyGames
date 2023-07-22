@@ -3,6 +3,7 @@ import {
   ArrowPathIcon,
   EyeIcon,
   EyeSlashIcon,
+  InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import useLocalStorage from "../../../hooks/useLocalStorage";
@@ -14,6 +15,7 @@ import { GameBoard } from "./GameLogic";
 import PreviewModal from "./PreviewModal";
 import { SlidePuzzleSettingModal } from "./SettingModal";
 import { useEventListener } from "../../../hooks/useEventListener";
+import { BasicModal } from "../../modal/BasicModal";
 
 enum MoveDirection {
   UP = 1,
@@ -55,6 +57,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
     "slidepuzzle-lowestmoves",
     0,
   );
+  const [openInfoModal, setOpenInfoModal] = useState<boolean>(false);
 
   const getClonedBoard = (): GameBoard => {
     return Object.assign(Object.create(Object.getPrototypeOf(board)), board);
@@ -223,54 +226,82 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
             })}
           </div>
         )}
-        <div className="flex w-full flex-col items-center justify-between gap-4 sm:flex-row lg:w-auto lg:flex-col">
-          <div className="flex w-full flex-row gap-2 lg:flex-col">
-            <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 lg:w-full">
-              <span className="text-xs sm:text-base">Moves</span>
-              <p className="text-base font-semibold sm:text-3xl">
-                {board.movesCount}
-              </p>
-            </div>
-            <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20">
-              <span className="text-xs sm:text-base">Lowest moves</span>
-              <p className="text-base font-semibold sm:text-3xl">
-                {lowestMoves}
-              </p>
-            </div>
+        <div className="flex w-full flex-col items-center justify-between gap-4 sm:flex-col lg:w-auto lg:flex-col">
+          <div className="flex w-full justify-end">
+            <button
+              onClick={() => setOpenInfoModal(true)}
+              type="button"
+              className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
+              aria-label="How to play"
+            >
+              <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
+            </button>
           </div>
-          <div className="flex w-full items-center justify-end gap-2 lg:w-full lg:flex-col">
-            <button
-              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
-              onClick={() => setOpenPreviewModal((prev) => !prev)}
-            >
-              <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
-                {openPreviewModal ? "Hide" : "Preview"}
-              </span>
-              {openPreviewModal ? (
-                <EyeSlashIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
-              ) : (
-                <EyeIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
-              )}
-            </button>
-
-            <button
-              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
-              onClick={handleResetGame}
-            >
-              <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
-                Reset
-              </span>
-              <ArrowPathIcon className="block h-6 w-6 text-white dark:text-zinc-900 sm:hidden" />
-            </button>
-
-            <button
-              className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
-              onClick={() => setOpenSettingModal(true)}
-            >
-              <span className="text-base font-semibold text-white dark:text-zinc-900 lg:text-lg">
-                Settings
-              </span>
-            </button>
+          <div className="flex w-full flex-col gap-4">
+            <div className="flex w-full flex-row gap-2 lg:flex-col">
+              <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 lg:w-full">
+                <span className="text-xs sm:text-base">Moves</span>
+                <p className="text-base font-semibold sm:text-3xl">
+                  {board.movesCount}
+                </p>
+              </div>
+              <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20">
+                <span className="text-xs sm:text-base">Lowest moves</span>
+                <p className="text-base font-semibold sm:text-3xl">
+                  {lowestMoves}
+                </p>
+              </div>
+            </div>
+            <div className="flex w-full items-center justify-end gap-2 lg:w-full lg:flex-col">
+              <button
+                className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
+                onClick={() => setOpenPreviewModal((prev) => !prev)}
+              >
+                <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
+                  {openPreviewModal ? "Hide" : "Preview"}
+                </span>
+                {openPreviewModal ? (
+                  <EyeSlashIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
+                ) : (
+                  <EyeIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
+                )}
+              </button>
+              <button
+                className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
+                onClick={handleResetGame}
+              >
+                <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
+                  Reset
+                </span>
+                <ArrowPathIcon className="block h-6 w-6 text-white dark:text-zinc-900 sm:hidden" />
+              </button>
+              <button
+                className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
+                onClick={() => setOpenSettingModal(true)}
+              >
+                <span className="text-base font-semibold text-white dark:text-zinc-900 lg:text-lg">
+                  Settings
+                </span>
+              </button>
+              <BasicModal
+                title="How to Play"
+                isOpen={openInfoModal}
+                closeModal={setOpenInfoModal}
+                className="max-w-xl"
+              >
+                <div className="mt-2 flex w-full flex-col justify-center gap-2 border-t border-emerald-500 p-4 text-black dark:text-white">
+                  <span className="font-base w-full text-sm leading-relaxed">
+                    Welcome to our exciting puzzle game! Your goal is to
+                    complete the given image by moving the puzzle pieces around.
+                    Challenge yourself by adjusting the difficulty level in the
+                    settings. As you play the game. You can preview the puzzle
+                    using preview option in the game. Get ready to test your
+                    wits and have fun piecing together the images in this
+                    engaging and brain-teasing game! Happy puzzling!
+                  </span>
+                </div>
+              </BasicModal>
+            </div>
           </div>
         </div>
       </div>
