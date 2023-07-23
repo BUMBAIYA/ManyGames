@@ -7,7 +7,6 @@ import GameWonLostModal from "../../modal/GameWonLostModal";
 import useLocalStorage from "../../../hooks/useLocalStorage";
 import PageMeta from "../../utility/PageMeta";
 import { useSwipeable } from "react-swipeable";
-
 import { BasicModal } from "../../modal/BasicModal";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
@@ -168,26 +167,11 @@ export default function GameBoard() {
           />
         </div>
       </div>
-
-      {board.hasWon() && (
-        <GameWonLostModal
-          isOpen={openWonModal}
-          closeModal={handleCloseWonModal}
-          type="won"
-        >
-          <div className="mt-4">
-            <p className="mb-1 text-sm text-gray-500">
-              {`${board.score > highScore ? "New High Score" : "Score"}`}
-            </p>
-            <p className="text-3xl font-bold text-emerald-500">{board.score}</p>
-          </div>
-        </GameWonLostModal>
-      )}
       {(board.hasLost() || board.hasWon()) && (
         <GameWonLostModal
           isOpen={openWonModal}
           closeModal={handleCloseWonModal}
-          type={board.hasWon() ? "won" : "lost"}
+          isWon={board.hasWon() ? true : false}
         >
           <div className="mt-4">
             <p className="mb-1 text-sm text-gray-500">
