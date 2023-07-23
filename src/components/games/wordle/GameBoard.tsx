@@ -205,7 +205,7 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
         <GameWonLostModal
           isOpen={openModal}
           closeModal={handleCloseModal}
-          type={board.hasWon() ? "won" : "lost"}
+          isWon={board.hasWon()}
         >
           <div className="mt-4">
             <div className="text-md mb-1 text-gray-500">

@@ -2,7 +2,6 @@ import { useSwipeable } from "react-swipeable";
 import {
   ArrowPathIcon,
   EyeIcon,
-  EyeSlashIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
@@ -12,10 +11,10 @@ import { splitImageToTiles, verifyImageUrl } from "../../../utility/image";
 import GameWonLostModal from "../../modal/GameWonLostModal";
 import PageMeta from "../../utility/PageMeta";
 import { GameBoard } from "./GameLogic";
-import PreviewModal from "./PreviewModal";
 import { SlidePuzzleSettingModal } from "./SettingModal";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { BasicModal } from "../../modal/BasicModal";
+import PreviewModal from "./PreviewModal";
 
 enum MoveDirection {
   UP = 1,
@@ -258,13 +257,9 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
                 onClick={() => setOpenPreviewModal((prev) => !prev)}
               >
                 <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
-                  {openPreviewModal ? "Hide" : "Preview"}
+                  Preview
                 </span>
-                {openPreviewModal ? (
-                  <EyeSlashIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
-                ) : (
-                  <EyeIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
-                )}
+                <EyeIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
               </button>
               <button
                 className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
@@ -307,22 +302,24 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
       </div>
       <SlidePuzzleSettingModal
         isOpen={openSettingModal}
-        closeModal={handleCloseSettingModal}
+        closeModal={setOpenSettingModal}
         imageUrl={imageUrl}
         col={boardTileDimenstion.col}
         row={boardTileDimenstion.row}
         submit={handleUpatePuzzle}
       />
       <PreviewModal
+        title="Puzzle preview"
         isOpen={openPreviewModal}
-        closeModal={() => setOpenPreviewModal(false)}
+        closeModal={setOpenPreviewModal}
+        className="max-w-2xl"
         imageUrl={imageUrl}
       />
       {board.hasWon() && (
         <GameWonLostModal
           isOpen={openWonModal}
           closeModal={handleCloseWonModal}
-          type="won"
+          isWon
         >
           <div className="mt-4">
             <p className="mb-1 text-sm text-gray-500">

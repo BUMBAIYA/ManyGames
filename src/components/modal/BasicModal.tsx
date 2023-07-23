@@ -3,15 +3,16 @@ import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { classNames } from "../../utility/css";
 
-export type BasicModal = {
+export type BasicModalProps = {
   title?: string;
-  children: ReactNode;
+  children?: ReactNode;
   isOpen: boolean;
   closeModal: Dispatch<React.SetStateAction<boolean>>;
   className?: string;
+  confetti?: ReactNode;
 };
 
-export function BasicModal(props: BasicModal) {
+export function BasicModal(props: BasicModalProps) {
   const { title, children, isOpen, closeModal, className } = props;
 
   return (
@@ -30,6 +31,7 @@ export function BasicModal(props: BasicModal) {
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
+          {props.confetti}
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
@@ -47,7 +49,7 @@ export function BasicModal(props: BasicModal) {
                 )}
               >
                 <div className="flex items-center justify-between">
-                  <Dialog.Title className="font-semibold dark:text-gray-200">
+                  <Dialog.Title className="text-lg font-semibold dark:text-gray-200">
                     {title ?? "Basic modal"}
                   </Dialog.Title>
                   <button onClick={() => closeModal(false)}>
