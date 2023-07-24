@@ -6,7 +6,10 @@ import { WorldLetter } from "./WordleLetter";
 import { useDictionaryApi } from "../../../utility/word";
 import GameWonLostModal from "../../modal/GameWonLostModal";
 import { useEventListener } from "../../../hooks/useEventListener";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/24/outline";
 import { BasicModal } from "../../modal/BasicModal";
 import styles from "./style.module.css";
 
@@ -31,6 +34,11 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
       setBoard(new WordleLogic(word));
       setWordMeaning(data.definition);
     }
+  };
+
+  const handleResetGame = () => {
+    if (board.currentAttempt === 1) return;
+    getInitialRandomWord();
   };
 
   const checkWordValidity = async (word: string) => {
@@ -135,7 +143,7 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
             </div>
             {board.testWord.map((row, rIndex) => {
               return (
-                <div key={rIndex} className="flex flex-row gap-2">
+                <div key={rIndex} className="flex flex-row gap-1">
                   {row.map((letter, cIndex) => {
                     return (
                       <WorldLetter
@@ -151,15 +159,33 @@ export default function WordleGameBoard(props: IWordleGameBoardProps) {
               );
             })}
           </div>
-          <div className="flex w-full justify-end">
-            <button
-              onClick={() => setOpenInfoModal(true)}
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
-              aria-label="How to play"
-            >
-              <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
-            </button>
+          <div className="flex w-full justify-end gap-4 lg:flex-col-reverse lg:justify-end">
+            <div className="flex gap-4">
+              <div className="flex w-full justify-end">
+                <button
+                  className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400  dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4"
+                  onClick={handleResetGame}
+                >
+                  <span className="hidden text-lg font-semibold text-white dark:text-zinc-900 sm:block">
+                    New game
+                  </span>
+                  <ArrowPathIcon className="block h-6 w-6 text-white dark:text-zinc-900 sm:hidden" />
+                </button>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex w-full justify-end">
+                <button
+                  onClick={() => setOpenInfoModal(true)}
+                  type="button"
+                  className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
+                  aria-label="How to play"
+                >
+                  <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
+                </button>
+              </div>
+            </div>
+
             <BasicModal
               title="Hints/ Clues"
               isOpen={openInfoModal}
