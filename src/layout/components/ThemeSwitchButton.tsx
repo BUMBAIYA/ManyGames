@@ -1,8 +1,4 @@
-import {
-  MagnifyingGlassIcon,
-  MoonIcon,
-  SunIcon,
-} from "@heroicons/react/24/outline";
+import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
 import useLocalStorage from "../../hooks/useLocalStorage";
 
@@ -18,15 +14,6 @@ export default function ThemeSwitchButton() {
 
   return (
     <div className="flex gap-4">
-      <div className="contents lg:hidden">
-        <button
-          type="button"
-          className="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5 lg:hidden focus:[&:not(:focus-visible)]:outline-none"
-          aria-label="Find something..."
-        >
-          <MagnifyingGlassIcon className="h-4 w-4 stroke-zinc-900 dark:stroke-white" />
-        </button>
-      </div>
       <button
         onClick={handleToggle}
         type="button"

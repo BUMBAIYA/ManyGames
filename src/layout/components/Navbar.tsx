@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Transition, Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import Searchbar from "./Searchbar";
 import ThemeSwitchButton from "./ThemeSwitchButton";
 import Logo from "../../assets/icons/Logo";
 import { Link } from "react-router-dom";
@@ -41,30 +40,33 @@ export default function Navbar() {
   return (
     <>
       <div
-        className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between gap-12 bg-white/[var(--bg-opacity-light)] px-4 backdrop-blur-sm transition dark:bg-zinc-900/[var(--bg-opacity-dark)] dark:backdrop-blur sm:px-6 lg:left-72 lg:z-30 lg:px-8"
+        className="sticky top-0 z-50 flex h-14 items-center justify-between gap-12 bg-white/[var(--bg-opacity-light)] px-4 backdrop-blur-sm transition dark:bg-zinc-900/[var(--bg-opacity-dark)] dark:backdrop-blur sm:px-6 lg:left-72 lg:z-30 lg:px-8"
         ref={navRef}
       >
         <div className="absolute inset-x-0 top-full h-px bg-zinc-900/10 transition dark:bg-white/10"></div>
-        <Searchbar />
         <div className="flex items-center gap-5 lg:hidden">
-          <button
-            type="button"
-            className="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
-            aria-label="Toggle navigation"
-            onClick={() => setOpen((prev) => !prev)}
-          >
-            {open ? (
-              <XMarkIcon className="w-4 stroke-zinc-900 dark:stroke-white" />
-            ) : (
-              <Bars3Icon className="w-4 stroke-zinc-900 dark:stroke-white" />
-            )}
-          </button>
-          <Link to="/" aria-label="Home">
+          <Link to="/" aria-label="Home" className="z-10 h-10 w-10">
             <Logo />
           </Link>
         </div>
-        <div className="flex items-center gap-5">
-          <ThemeSwitchButton />
+        <div className="flex w-full items-center justify-end gap-4">
+          <div className="flex items-center">
+            <ThemeSwitchButton />
+          </div>
+          <div className="lg:hidden">
+            <button
+              type="button"
+              className="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
+              aria-label="Toggle navigation"
+              onClick={() => setOpen((prev) => !prev)}
+            >
+              {open ? (
+                <XMarkIcon className="w-4 stroke-zinc-900 dark:stroke-white" />
+              ) : (
+                <Bars3Icon className="w-4 stroke-zinc-900 dark:stroke-white" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
       <Transition.Root show={open} as={Fragment}>
