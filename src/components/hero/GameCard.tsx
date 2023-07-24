@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { classNames } from "../../utility/css";
 
 export type GameCardPropsType = {
   title: string;
@@ -9,30 +10,28 @@ export type GameCardPropsType = {
 };
 
 export default function GameCard(props: GameCardPropsType) {
-  const imgRef = useRef<HTMLImageElement>(null);
+  const cardRef = useRef<HTMLImageElement>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const observerCallback = (entries: IntersectionObserverEntry[]) => {
+    const [entry] = entries;
+    setIsVisible(entry.isIntersecting);
+  };
+
+  const options = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 0.1,
+  };
+
   useEffect(() => {
-    if (imgRef.current) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setIsVisible(true);
-              observer.unobserve(imgRef.current!);
-            }
-          });
-        },
-        { rootMargin: "50px" },
-      );
-      observer.observe(imgRef.current);
-      return () => {
-        if (imgRef.current === null) return;
-        observer.unobserve(imgRef.current!);
-      };
-    }
-  }, [props.imageUrl]);
+    const observer = new IntersectionObserver(observerCallback, options);
+    if (cardRef.current) observer.observe(cardRef.current);
+    return () => {
+      if (cardRef.current) observer.unobserve(cardRef.current);
+    };
+  }, [cardRef, options]);
 
   const handleImageLoad = () => {
     setIsLoading(false);
@@ -41,27 +40,30 @@ export default function GameCard(props: GameCardPropsType) {
   return (
     <Link
       to={props.link}
-      className="flex flex-col overflow-hidden rounded-xl border border-gray-300 bg-white transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800 dark:hover:shadow-black"
+      className="flex flex-col overflow-hidden rounded-md bg-white transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-700 dark:hover:shadow-black"
     >
-      <div className="mx-2 mt-2 overflow-hidden rounded-md border dark:border-zinc-700">
+      <div
+        ref={cardRef}
+        className="overflow-hidden border dark:border-zinc-700 lg:mx-2 lg:mt-2"
+      >
         {isLoading && (
           <div className="aspect-square w-full animate-pulse bg-gray-200 dark:bg-zinc-700"></div>
         )}
+
         <img
-          alt="Icon"
+          alt={props.title}
           className="w-full bg-cover"
-          style={{ opacity: isVisible ? 1 : 0 }}
-          ref={imgRef}
+          style={{ display: isLoading ? "none" : "block" }}
           src={isVisible ? props.imageUrl : ""}
           onLoad={handleImageLoad}
         />
       </div>
-      <div className="flex flex-col p-4 pb-6 xl:p-6">
+      <div className="flex flex-col rounded-b-md border border-t-0 border-gray-300 p-2 dark:border-0 lg:px-3 lg:pb-4">
         <div className="flex flex-col">
-          <span className="text-lg font-bold dark:text-white">
+          <span className="text-md font-semibold dark:text-white">
             {props.title}
           </span>
-          <p className="justify-end text-gray-500 dark:text-gray-400">
+          <p className="hidden justify-end py-2 text-sm text-gray-500 dark:text-gray-400 lg:block">
             {props.description}
           </p>
         </div>

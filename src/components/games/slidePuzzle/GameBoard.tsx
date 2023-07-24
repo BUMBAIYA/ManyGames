@@ -36,8 +36,8 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
   const [boardTileDimenstion, setBoardTileDimension] = useLocalStorage(
     "slidingpuzzle-boardsize",
     {
-      col: 7,
-      row: 5,
+      col: 3,
+      row: 3,
     },
   );
   const [board, setBoard] = useState(

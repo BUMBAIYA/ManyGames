@@ -96,7 +96,7 @@ export default function GameBoard() {
         {row.map((_, colIndex) => {
           return (
             <div
-              className="h-[76px] w-[76px] rounded-md border border-emerald-600 bg-gray-100 shadow-sm dark:border-emerald-800 dark:bg-zinc-900 sm:h-32 sm:w-32"
+              className="h-[76px] w-[76px] rounded-md border border-emerald-600 bg-white shadow-sm dark:border-emerald-800 dark:bg-zinc-900 sm:h-32 sm:w-32"
               key={colIndex}
             />
           );

@@ -30,7 +30,7 @@ export default function Hero() {
         games and puzzles!"
       />
       <div className="mb-16 flex flex-col items-center">
-        <div className="grid grid-cols-1 gap-8 border-t border-zinc-900/5 pt-4 dark:border-white/5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        <div className="grid w-full grid-cols-2 gap-8 pt-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           <GameCardFallback
             imageUrl="/assets/2048Icon.png"
             link="/2048"
