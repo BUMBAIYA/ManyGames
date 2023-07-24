@@ -40,7 +40,7 @@ export default function GameCard(props: GameCardPropsType) {
   return (
     <Link
       to={props.link}
-      className="flex flex-col overflow-hidden rounded-md bg-white transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-700 dark:hover:shadow-black"
+      className="flex flex-col overflow-hidden rounded-md bg-white transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-700 dark:hover:shadow-black lg:border lg:border-zinc-300"
     >
       <div
         ref={cardRef}
@@ -58,7 +58,7 @@ export default function GameCard(props: GameCardPropsType) {
           onLoad={handleImageLoad}
         />
       </div>
-      <div className="flex flex-col rounded-b-md border border-t-0 border-gray-300 p-2 dark:border-0 lg:px-3 lg:pb-4">
+      <div className="flex flex-col rounded-b-md border border-t-0 border-gray-300 p-2 dark:border-0 lg:border-0 lg:px-3 lg:pb-4">
         <div className="flex flex-col">
           <span className="text-md font-semibold dark:text-white">
             {props.title}
