@@ -2,7 +2,7 @@ import GithubLogo from "../../assets/icons/GithubLogo";
 
 export default function Footer() {
   return (
-    <footer className="space-y-10 pb-10">
+    <footer className="hidden space-y-10 pb-10 lg:block">
       <div className="flex flex-col items-center justify-between gap-5 border-t border-zinc-900/5 pt-8 dark:border-white/5 sm:flex-row">
         <div className="flex gap-4">
           <a
