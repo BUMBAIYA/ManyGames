@@ -161,6 +161,7 @@ export default function SlidePuzzleBoard() {
   };
 
   const handleUpatePuzzle = (img: string, size: number) => {
+    setOpenSettingModal(false);
     setIsBoardBuilding(true);
     setBoardData({ ...boardData, currentMove: 0, size, imageUrl: img });
     loadImage(img, size);

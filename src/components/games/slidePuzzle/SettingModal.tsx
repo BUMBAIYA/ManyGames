@@ -30,7 +30,6 @@ export function SlidePuzzleSettingModal(props: SlidePuzzleSettingModalProps) {
       props.closeModal(false);
       return;
     }
-    props.closeModal(false);
     setShowVerifyImage(false);
     setImageUrl(verifiedImageUrl);
     props.submit(verifiedImageUrl, puzzleSize);
