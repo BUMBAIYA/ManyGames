@@ -1,210 +1,323 @@
-import { useSwipeable } from "react-swipeable";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowPathIcon,
+  Cog6ToothIcon,
   EyeIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
-import { useEffect, useRef, useState } from "react";
+import { useSwipeable } from "react-swipeable";
 import useLocalStorage from "../../../hooks/useLocalStorage";
-import { classNames } from "../../../utility/css";
-import { splitImageToTiles, verifyImageUrl } from "../../../utility/image";
+import { useHotkey } from "../../../hooks/useHotKey";
 import GameWonLostModal from "../../modal/GameWonLostModal";
-import PageMeta from "../../utility/PageMeta";
-import { GameBoard } from "./GameLogic";
+import { BuildingBoardLoader } from "./BuildingBoardLoader";
+import { ErrorMessage } from "./ErrorMessage";
+import { PreviewModal } from "./PreviewModal";
 import { SlidePuzzleSettingModal } from "./SettingModal";
-import { useEventListener } from "../../../hooks/useEventListener";
 import { BasicModal } from "../../modal/BasicModal";
-import PreviewModal from "./PreviewModal";
+import { generateRandomTiles, getPositionOfEmptyTile } from "./helper";
+import { splitImageToTiles, verifyImageUrl } from "../../../utility/image";
+import { classNames } from "../../../utility/css";
 
-enum MoveDirection {
-  UP = 1,
-  DOWN = 3,
-  RIGHT = 2,
-  LEFT = 4,
-}
-
-export const DEFAULT_SLIDEPUZZLE_IMG_URL = import.meta.env.PROD
+export const DEFAULT_PUZZLE_IMG_URL = import.meta.env.PROD
   ? "https://manygames.vercel.app/assets/puzzle.jpg"
   : "/assets/puzzle.jpg";
 
-export interface IPuzzleProps {}
+type MoveDirection = "UP" | "DOWN" | "RIGHT" | "LEFT";
 
-export default function SlidePuzzleBoard(props: IPuzzleProps) {
+type SlidePuzzleData = {
+  col: number;
+  row: number;
+  imageUrl: string;
+  highscore: number;
+  currentMove: number;
+};
+
+export default function SlidePuzzleBoard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const refLoadingError = useRef<HTMLElement>(null);
 
-  const [boardTileDimenstion, setBoardTileDimension] = useLocalStorage(
-    "slidingpuzzle-boardsize",
+  const [isError, setIsError] = useState<boolean>(false);
+  const [isBoardBuilding, setIsBoardBuilding] = useState<boolean>(true);
+  const [isWon, setIsWon] = useState<boolean>(false);
+
+  const [boardData, setBoardData] = useLocalStorage<SlidePuzzleData>(
+    "puzzle-data",
     {
       col: 3,
       row: 3,
+      imageUrl: DEFAULT_PUZZLE_IMG_URL,
+      highscore: 0,
+      currentMove: 0,
     },
   );
-  const [board, setBoard] = useState(
-    new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row),
+  const [tiles, setTiles] = useLocalStorage<number[]>(
+    "puzzle-state",
+    generateRandomTiles(boardData.row, boardData.col),
   );
-  const [imageUrl, setImageUrl] = useLocalStorage<string>(
-    "slidepuzzle-imageUrl",
-    DEFAULT_SLIDEPUZZLE_IMG_URL,
-  );
+
   const [imageTiles, setImageTiles] = useState<string[]>([]);
-  const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
+
+  const [openWonModal, setOpenWonModal] = useState<boolean>(false);
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
-  const [openWonModal, setOpenWonModal] = useState<boolean>(true);
-  const [loadingBoard, setLoadingBoard] = useState<boolean>(true);
-  const [lowestMoves, setLowestMoves] = useLocalStorage<number>(
-    "slidepuzzle-lowestmoves",
-    0,
-  );
+  const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
   const [openInfoModal, setOpenInfoModal] = useState<boolean>(false);
 
-  const getClonedBoard = (): GameBoard => {
-    return Object.assign(Object.create(Object.getPrototypeOf(board)), board);
+  const [emptyTileIndex, setEmptyTileIndex] = useState<number>(0);
+
+  const loadImage = async (imageUrl: string, row: number, col: number) => {
+    let imageValidity = false;
+    imageValidity = await verifyImageUrl(imageUrl);
+    if (imageValidity) {
+      const tileImages = await splitImageToTiles(imageUrl, canvasRef, row, col);
+      setImageTiles(tileImages);
+    } else {
+      setIsError(true);
+    }
+    setIsBoardBuilding(!imageValidity);
+  };
+
+  const swapTile = (indexToBeSwiped: number) => {
+    let tempTile = [...tiles];
+    [tempTile[emptyTileIndex], tempTile[indexToBeSwiped]] = [
+      tempTile[indexToBeSwiped],
+      tempTile[emptyTileIndex],
+    ];
+    return tempTile;
+  };
+
+  const checkWonCondition = () => {
+    for (let i = 0; i < boardData.row * boardData.col; i++) {
+      if (tiles[i] !== i) return false;
+    }
+    return true;
   };
 
   const handleMoveTile = (dir: MoveDirection) => {
-    let newBoard = getClonedBoard().moveTile(dir);
-    if (newBoard == null) return;
-    setBoard(newBoard);
-  };
-
-  useEffect(() => {
-    setLoadingBoard(true);
-    let valid = false;
-    async function verifyImage() {
-      valid = await verifyImageUrl(imageUrl);
-      if (valid) {
-        const tileImages = await splitImageToTiles(
-          imageUrl,
-          canvasRef,
-          boardTileDimenstion.row,
-          boardTileDimenstion.col,
-        );
-        setImageTiles(tileImages);
-      } else {
-        if (refLoadingError.current) {
-          refLoadingError.current.innerHTML =
-            "Error! Check Internet connection or reload page";
-          refLoadingError.current.style.color = "red";
-          refLoadingError.current.previousElementSibling?.classList.toggle(
-            "hidden",
-          );
-        }
-      }
-      setLoadingBoard(!valid);
-    }
-    verifyImage();
-  }, [imageUrl, boardTileDimenstion.row, boardTileDimenstion.col]);
-
-  useEffect(() => {
-    setBoard(new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row));
-  }, [boardTileDimenstion.col, boardTileDimenstion.row]);
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.currentTarget !== document.activeElement) return;
-    if (event.keyCode > 40 || event.keyCode < 37) return;
-    event.preventDefault();
-    if (event.repeat) return;
-
-    switch (event.key) {
-      case "ArrowUp": {
-        handleMoveTile(MoveDirection.UP);
+    switch (dir) {
+      case "UP": {
+        let indexToBeSwaped = emptyTileIndex + boardData.col;
+        if (indexToBeSwaped > boardData.col * boardData.row - 1) break;
+        setTiles(swapTile(indexToBeSwaped));
+        setBoardData({ ...boardData, currentMove: boardData.currentMove + 1 });
         break;
       }
-      case "ArrowDown": {
-        handleMoveTile(MoveDirection.DOWN);
+      case "DOWN": {
+        if (emptyTileIndex - boardData.col < 0) break;
+        let indexToBeSwaped = emptyTileIndex - boardData.col;
+        setTiles(swapTile(indexToBeSwaped));
+        setBoardData((prev) => ({
+          ...prev,
+          currentMove: prev.currentMove + 1,
+        }));
         break;
       }
-      case "ArrowRight": {
-        handleMoveTile(MoveDirection.RIGHT);
+      case "RIGHT": {
+        if (emptyTileIndex === 0) break;
+        if (emptyTileIndex % boardData.col === 0) break;
+        setTiles(swapTile(emptyTileIndex - 1));
+        setBoardData((prev) => ({
+          ...prev,
+          currentMove: prev.currentMove + 1,
+        }));
         break;
       }
-      case "ArrowLeft": {
-        handleMoveTile(MoveDirection.LEFT);
+      case "LEFT": {
+        if ((emptyTileIndex + 1) % boardData.col === 0) break;
+        setTiles(swapTile(emptyTileIndex + 1));
+        setBoardData((prev) => ({
+          ...prev,
+          currentMove: prev.currentMove + 1,
+        }));
         break;
       }
-      default: {
+      default:
         return;
-      }
     }
   };
 
-  useEventListener("keydown", handleKeyDown, document.body, false);
+  useEffect(() => {
+    setEmptyTileIndex(getPositionOfEmptyTile(tiles));
+    let isWon = checkWonCondition();
+    setIsWon(isWon);
+    if (isWon) {
+      setTimeout(() => {
+        setOpenWonModal(true);
+      }, 1500);
+    }
+  }, [tiles]);
+
+  useEffect(() => {
+    loadImage(boardData.imageUrl, boardData.row, boardData.col);
+  }, [boardData.imageUrl, boardData.row, boardData.col]);
+
+  const handleResetBoard = () => {
+    setBoardData({ ...boardData, currentMove: 0 });
+    setTiles(generateRandomTiles(boardData.row, boardData.col));
+  };
+
+  const handleUpatePuzzle = (img: string, col: number, row: number) => {
+    setIsBoardBuilding(true);
+    setBoardData({ ...boardData, col, row, imageUrl: img });
+    loadImage(img, row, col);
+    setTiles(generateRandomTiles(row, col));
+  };
+
+  const handleCloseWonModal = () => {
+    setOpenWonModal(false);
+    if (
+      boardData.currentMove < boardData.highscore ||
+      boardData.highscore === 0
+    ) {
+      setBoardData((prev) => ({
+        ...prev,
+        highscore: boardData.currentMove,
+        currentMove: 0,
+      }));
+    } else {
+      setBoardData({ ...boardData, currentMove: 0 });
+    }
+    setIsWon(false);
+    setTiles(generateRandomTiles(boardData.row, boardData.col));
+  };
+
+  useHotkey([
+    ["ArrowUp", () => handleMoveTile("UP")],
+    ["ArrowDown", () => handleMoveTile("DOWN")],
+    ["ArrowRight", () => handleMoveTile("RIGHT")],
+    ["ArrowLeft", () => handleMoveTile("LEFT")],
+  ]);
 
   const touchSwipeHandlers = useSwipeable({
     onSwipedUp: () => {
-      handleMoveTile(MoveDirection.UP);
+      handleMoveTile("UP");
     },
     onSwipedDown: () => {
-      handleMoveTile(MoveDirection.DOWN);
+      handleMoveTile("DOWN");
     },
     onSwipedRight: () => {
-      handleMoveTile(MoveDirection.RIGHT);
+      handleMoveTile("RIGHT");
     },
     onSwipedLeft: () => {
-      handleMoveTile(MoveDirection.LEFT);
+      handleMoveTile("LEFT");
     },
     swipeDuration: 500,
     preventScrollOnSwipe: true,
     trackMouse: true,
   });
 
-  const handleResetGame = () => {
-    setBoard(new GameBoard(boardTileDimenstion.col, boardTileDimenstion.row));
-  };
-
-  const handleUpatePuzzle = (img: string, col: number, row: number) => {
-    setImageUrl(img);
-    setBoardTileDimension({ col, row });
-  };
-
-  const handleCloseSettingModal = () => {
-    setOpenSettingModal(false);
-  };
-
-  const handleCloseWonModal = () => {
-    setOpenWonModal(false);
-    handleResetGame();
-    setOpenWonModal(true);
-    if (board.movesCount < lowestMoves || lowestMoves === 0) {
-      setLowestMoves(board.movesCount);
-    }
-  };
-
   return (
-    <div className="flex flex-col justify-center gap-10">
-      <PageMeta
-        title="ManyGames | Slide Puzzle"
-        description="Play sliding puzzle online with different levels of difficulties"
-      />
-      <canvas ref={canvasRef} className="hidden"></canvas>
-      <div className="flex w-full flex-col-reverse items-center justify-center gap-6 lg:flex-row lg:items-start">
-        {loadingBoard && (
-          <div className="flex w-full max-w-3xl items-center justify-center gap-2 text-zinc-900 dark:text-emerald-400">
-            <ArrowPathIcon className="h-6 w-6 animate-spin stroke-zinc-900 dark:stroke-emerald-400" />
-            <span ref={refLoadingError} className="text-2xl">
-              Building board...
-            </span>
+    <>
+      <canvas ref={canvasRef} className="hidden" />
+      <div className="relative flex flex-col justify-center gap-4 xl:flex-row-reverse">
+        <div className="flex w-full flex-col justify-between gap-2 xl:w-auto xl:flex-col xl:justify-start">
+          <div className="flex w-full justify-end">
+            <button
+              onClick={() => setOpenInfoModal(true)}
+              type="button"
+              className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
+              aria-label="How to play"
+            >
+              <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
+            </button>
+            <BasicModal
+              title="How to Play"
+              isOpen={openInfoModal}
+              closeModal={setOpenInfoModal}
+              className="max-w-xl"
+            >
+              <div className="mt-2 flex w-full flex-col justify-center gap-2 border-t border-emerald-500 p-4 text-black dark:text-white">
+                <span className="font-base w-full text-sm leading-relaxed">
+                  Welcome to our exciting puzzle game! Your goal is to complete
+                  the given image by moving the puzzle pieces around. Challenge
+                  yourself by adjusting the difficulty level in the settings. As
+                  you play the game. You can preview the puzzle using preview
+                  option in the game. Get ready to test your wits and have fun
+                  piecing together the images in this engaging and brain-teasing
+                  game! Happy puzzling!
+                </span>
+              </div>
+            </BasicModal>
           </div>
-        )}
-        {!loadingBoard && (
+          <div className="flex w-full justify-between gap-2 xl:flex-col">
+            <div className="flex w-full flex-row gap-2 md:w-auto xl:flex-col">
+              <div className="inline rounded-md bg-emerald-400/10 px-2 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 md:px-4 lg:w-full">
+                <span className="text-xs sm:text-base">Moves</span>
+                <p className="text-base font-semibold sm:text-3xl">
+                  {boardData.currentMove}
+                </p>
+              </div>
+              <div className="inline rounded-md bg-emerald-400/10 px-2 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 md:px-4 lg:w-full">
+                <span className="text-xs sm:text-base">Highscore</span>
+                <p className="text-base font-semibold sm:text-3xl">
+                  {boardData.highscore}
+                </p>
+              </div>
+            </div>
+            <div className="flex h-min gap-2 xl:flex-1 xl:flex-col">
+              <button
+                className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
+                aria-label="preview puzzle"
+                onClick={() => setOpenPreviewModal(true)}
+              >
+                <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
+                  Preview
+                </span>
+                <EyeIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
+              </button>
+              <PreviewModal
+                title="Puzzle preview"
+                isOpen={openPreviewModal}
+                closeModal={setOpenPreviewModal}
+                className="max-w-2xl"
+                imageUrl={boardData.imageUrl}
+              />
+              <button
+                className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
+                aria-label="reset puzzle"
+                onClick={handleResetBoard}
+              >
+                <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
+                  Reset
+                </span>
+                <ArrowPathIcon className="block h-6 w-6 text-white dark:text-zinc-900 sm:hidden" />
+              </button>
+              <button
+                className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
+                aria-label="puzzle setting"
+                onClick={() => setOpenSettingModal(true)}
+              >
+                <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
+                  Setting
+                </span>
+                <Cog6ToothIcon className="block h-6 w-6 text-white dark:text-zinc-900 sm:hidden" />
+              </button>
+              <SlidePuzzleSettingModal
+                isOpen={openSettingModal}
+                closeModal={setOpenSettingModal}
+                imageUrl={boardData.imageUrl}
+                col={boardData.col}
+                row={boardData.row}
+                submit={handleUpatePuzzle}
+              />
+            </div>
+          </div>
+        </div>
+        {isError && <ErrorMessage />}
+        {isError ? null : isBoardBuilding ? (
+          <BuildingBoardLoader />
+        ) : (
           <div
             {...touchSwipeHandlers}
             className={classNames(
-              board.hasWon() ? "" : "gap-[2px] sm:gap-1",
+              isWon ? "" : "gap-[2px] sm:gap-1",
               "grid w-full max-w-3xl select-none rounded-sm bg-zinc-900 p-[2px] dark:bg-emerald-800 sm:rounded-md sm:p-1",
             )}
             style={{
-              gridTemplateColumns: `repeat(${boardTileDimenstion.col}, minmax(0, 1fr))`,
-              gridTemplateRows: `repeat(${boardTileDimenstion.row}, minmax(0, 1fr))`,
+              gridTemplateColumns: `repeat(${boardData.col}, minmax(0, 1fr))`,
+              gridTemplateRows: `repeat(${boardData.row}, minmax(0, 1fr))`,
             }}
           >
-            {board.tiles.map((_tile, index) => {
-              if (
-                _tile ===
-                  boardTileDimenstion.col * boardTileDimenstion.row - 1 &&
-                !board.won
-              ) {
+            {tiles.map((_tile, index) => {
+              if (index === emptyTileIndex && !isWon) {
                 return (
                   <div
                     key={index}
@@ -217,7 +330,7 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
                   src={imageTiles[_tile]}
                   key={index}
                   className={classNames(
-                    board.hasWon() ? "" : "rounded-sm",
+                    isWon ? "" : "rounded-sm",
                     "pointer-events-none h-full w-full select-none bg-cover bg-no-repeat",
                   )}
                 />
@@ -225,116 +338,27 @@ export default function SlidePuzzleBoard(props: IPuzzleProps) {
             })}
           </div>
         )}
-        <div className="flex w-full flex-col items-center justify-between gap-4 sm:flex-col lg:w-auto lg:flex-col">
-          <div className="flex w-full justify-end">
-            <button
-              onClick={() => setOpenInfoModal(true)}
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
-              aria-label="How to play"
-            >
-              <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
-            </button>
-          </div>
-          <div className="flex w-full flex-col gap-4">
-            <div className="flex w-full flex-row gap-2 lg:flex-col">
-              <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 lg:w-full">
-                <span className="text-xs sm:text-base">Moves</span>
-                <p className="text-base font-semibold sm:text-3xl">
-                  {board.movesCount}
-                </p>
-              </div>
-              <div className="inline rounded-md bg-emerald-400/10 px-4 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20">
-                <span className="text-xs sm:text-base">Lowest moves</span>
-                <p className="text-base font-semibold sm:text-3xl">
-                  {lowestMoves}
-                </p>
-              </div>
+        {isWon && (
+          <GameWonLostModal
+            isOpen={openWonModal}
+            closeModal={handleCloseWonModal}
+            isWon
+          >
+            <div className="mt-4">
+              <p className="mb-1 text-sm text-gray-500">
+                {`${
+                  boardData.currentMove < boardData.highscore
+                    ? "New Lowest Score"
+                    : "Score"
+                } for ${boardData.row}x${boardData.col} board`}
+              </p>
+              <p className="text-3xl font-bold text-emerald-500">
+                {boardData.currentMove}
+              </p>
             </div>
-            <div className="flex w-full items-center justify-end gap-2 lg:w-full lg:flex-col">
-              <button
-                className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
-                onClick={() => setOpenPreviewModal((prev) => !prev)}
-              >
-                <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
-                  Preview
-                </span>
-                <EyeIcon className="block h-6 w-6 stroke-white dark:stroke-zinc-900 sm:hidden" />
-              </button>
-              <button
-                className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
-                onClick={handleResetGame}
-              >
-                <span className="hidden text-base font-semibold text-white dark:text-zinc-900 sm:block lg:text-lg">
-                  Reset
-                </span>
-                <ArrowPathIcon className="block h-6 w-6 text-white dark:text-zinc-900 sm:hidden" />
-              </button>
-              <button
-                className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
-                onClick={() => setOpenSettingModal(true)}
-              >
-                <span className="text-base font-semibold text-white dark:text-zinc-900 lg:text-lg">
-                  Settings
-                </span>
-              </button>
-              <BasicModal
-                title="How to Play"
-                isOpen={openInfoModal}
-                closeModal={setOpenInfoModal}
-                className="max-w-xl"
-              >
-                <div className="mt-2 flex w-full flex-col justify-center gap-2 border-t border-emerald-500 p-4 text-black dark:text-white">
-                  <span className="font-base w-full text-sm leading-relaxed">
-                    Welcome to our exciting puzzle game! Your goal is to
-                    complete the given image by moving the puzzle pieces around.
-                    Challenge yourself by adjusting the difficulty level in the
-                    settings. As you play the game. You can preview the puzzle
-                    using preview option in the game. Get ready to test your
-                    wits and have fun piecing together the images in this
-                    engaging and brain-teasing game! Happy puzzling!
-                  </span>
-                </div>
-              </BasicModal>
-            </div>
-          </div>
-        </div>
+          </GameWonLostModal>
+        )}
       </div>
-      <SlidePuzzleSettingModal
-        isOpen={openSettingModal}
-        closeModal={setOpenSettingModal}
-        imageUrl={imageUrl}
-        col={boardTileDimenstion.col}
-        row={boardTileDimenstion.row}
-        submit={handleUpatePuzzle}
-      />
-      <PreviewModal
-        title="Puzzle preview"
-        isOpen={openPreviewModal}
-        closeModal={setOpenPreviewModal}
-        className="max-w-2xl"
-        imageUrl={imageUrl}
-      />
-      {board.hasWon() && (
-        <GameWonLostModal
-          isOpen={openWonModal}
-          closeModal={handleCloseWonModal}
-          isWon
-        >
-          <div className="mt-4">
-            <p className="mb-1 text-sm text-gray-500">
-              {`${
-                board.movesCount < lowestMoves ? "New Lowest Score" : "Score"
-              } for ${boardTileDimenstion.row}x${
-                boardTileDimenstion.col
-              } board`}
-            </p>
-            <p className="text-3xl font-bold text-emerald-500">
-              {board.movesCount}
-            </p>
-          </div>
-        </GameWonLostModal>
-      )}
-    </div>
+    </>
   );
 }

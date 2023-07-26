@@ -4,7 +4,7 @@ type PreviewModalProps = {
   imageUrl: string;
 } & BasicModalProps;
 
-export default function PreviewModal(props: PreviewModalProps) {
+export function PreviewModal(props: PreviewModalProps) {
   return (
     <BasicModal
       title="Puzzle preview"
