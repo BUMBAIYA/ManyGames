@@ -23,11 +23,12 @@ export const DEFAULT_PUZZLE_IMG_URL = import.meta.env.PROD
   ? "https://manygames.vercel.app/assets/puzzle.jpg"
   : "/assets/puzzle.jpg";
 
+export const PUZZLE_SIZES = [3, 4, 5, 6] as const;
+
 type MoveDirection = "UP" | "DOWN" | "RIGHT" | "LEFT";
 
 type SlidePuzzleData = {
-  col: number;
-  row: number;
+  size: number;
   imageUrl: string;
   highscore: number;
   currentMove: number;
@@ -43,8 +44,7 @@ export default function SlidePuzzleBoard() {
   const [boardData, setBoardData] = useLocalStorage<SlidePuzzleData>(
     "puzzle-data",
     {
-      col: 3,
-      row: 3,
+      size: 3,
       imageUrl: DEFAULT_PUZZLE_IMG_URL,
       highscore: 0,
       currentMove: 0,
@@ -52,7 +52,7 @@ export default function SlidePuzzleBoard() {
   );
   const [tiles, setTiles] = useLocalStorage<number[]>(
     "puzzle-state",
-    generateRandomTiles(boardData.row, boardData.col),
+    generateRandomTiles(boardData.size),
   );
 
   const [imageTiles, setImageTiles] = useState<string[]>([]);
@@ -64,11 +64,16 @@ export default function SlidePuzzleBoard() {
 
   const [emptyTileIndex, setEmptyTileIndex] = useState<number>(0);
 
-  const loadImage = async (imageUrl: string, row: number, col: number) => {
+  const loadImage = async (imageUrl: string, size: number) => {
     let imageValidity = false;
     imageValidity = await verifyImageUrl(imageUrl);
     if (imageValidity) {
-      const tileImages = await splitImageToTiles(imageUrl, canvasRef, row, col);
+      const tileImages = await splitImageToTiles(
+        imageUrl,
+        canvasRef,
+        size,
+        size,
+      );
       setImageTiles(tileImages);
     } else {
       setIsError(true);
@@ -86,7 +91,7 @@ export default function SlidePuzzleBoard() {
   };
 
   const checkWonCondition = () => {
-    for (let i = 0; i < boardData.row * boardData.col; i++) {
+    for (let i = 0; i < boardData.size * boardData.size; i++) {
       if (tiles[i] !== i) return false;
     }
     return true;
@@ -95,15 +100,15 @@ export default function SlidePuzzleBoard() {
   const handleMoveTile = (dir: MoveDirection) => {
     switch (dir) {
       case "UP": {
-        let indexToBeSwaped = emptyTileIndex + boardData.col;
-        if (indexToBeSwaped > boardData.col * boardData.row - 1) break;
+        let indexToBeSwaped = emptyTileIndex + boardData.size;
+        if (indexToBeSwaped > boardData.size * boardData.size - 1) break;
         setTiles(swapTile(indexToBeSwaped));
         setBoardData({ ...boardData, currentMove: boardData.currentMove + 1 });
         break;
       }
       case "DOWN": {
-        if (emptyTileIndex - boardData.col < 0) break;
-        let indexToBeSwaped = emptyTileIndex - boardData.col;
+        if (emptyTileIndex - boardData.size < 0) break;
+        let indexToBeSwaped = emptyTileIndex - boardData.size;
         setTiles(swapTile(indexToBeSwaped));
         setBoardData((prev) => ({
           ...prev,
@@ -113,7 +118,7 @@ export default function SlidePuzzleBoard() {
       }
       case "RIGHT": {
         if (emptyTileIndex === 0) break;
-        if (emptyTileIndex % boardData.col === 0) break;
+        if (emptyTileIndex % boardData.size === 0) break;
         setTiles(swapTile(emptyTileIndex - 1));
         setBoardData((prev) => ({
           ...prev,
@@ -122,7 +127,7 @@ export default function SlidePuzzleBoard() {
         break;
       }
       case "LEFT": {
-        if ((emptyTileIndex + 1) % boardData.col === 0) break;
+        if ((emptyTileIndex + 1) % boardData.size === 0) break;
         setTiles(swapTile(emptyTileIndex + 1));
         setBoardData((prev) => ({
           ...prev,
@@ -147,19 +152,19 @@ export default function SlidePuzzleBoard() {
   }, [tiles]);
 
   useEffect(() => {
-    loadImage(boardData.imageUrl, boardData.row, boardData.col);
-  }, [boardData.imageUrl, boardData.row, boardData.col]);
+    loadImage(boardData.imageUrl, boardData.size);
+  }, [boardData.imageUrl, boardData.size]);
 
   const handleResetBoard = () => {
     setBoardData({ ...boardData, currentMove: 0 });
-    setTiles(generateRandomTiles(boardData.row, boardData.col));
+    setTiles(generateRandomTiles(boardData.size));
   };
 
-  const handleUpatePuzzle = (img: string, col: number, row: number) => {
+  const handleUpatePuzzle = (img: string, size: number) => {
     setIsBoardBuilding(true);
-    setBoardData({ ...boardData, col, row, imageUrl: img });
-    loadImage(img, row, col);
-    setTiles(generateRandomTiles(row, col));
+    setBoardData({ ...boardData, currentMove: 0, size, imageUrl: img });
+    loadImage(img, size);
+    setTiles(generateRandomTiles(size));
   };
 
   const handleCloseWonModal = () => {
@@ -177,7 +182,7 @@ export default function SlidePuzzleBoard() {
       setBoardData({ ...boardData, currentMove: 0 });
     }
     setIsWon(false);
-    setTiles(generateRandomTiles(boardData.row, boardData.col));
+    setTiles(generateRandomTiles(boardData.size));
   };
 
   useHotkey([
@@ -299,8 +304,7 @@ export default function SlidePuzzleBoard() {
                 isOpen={openSettingModal}
                 closeModal={setOpenSettingModal}
                 imageUrl={boardData.imageUrl}
-                col={boardData.col}
-                row={boardData.row}
+                size={boardData.size}
                 submit={handleUpatePuzzle}
               />
             </div>
@@ -317,8 +321,8 @@ export default function SlidePuzzleBoard() {
               "grid w-full max-w-3xl select-none rounded-sm bg-zinc-900 p-[2px] dark:bg-emerald-800 sm:rounded-md sm:p-1",
             )}
             style={{
-              gridTemplateColumns: `repeat(${boardData.col}, minmax(0, 1fr))`,
-              gridTemplateRows: `repeat(${boardData.row}, minmax(0, 1fr))`,
+              gridTemplateColumns: `repeat(${boardData.size}, minmax(0, 1fr))`,
+              gridTemplateRows: `repeat(${boardData.size}, minmax(0, 1fr))`,
             }}
           >
             {tiles.map((_tile, index) => {
@@ -355,7 +359,7 @@ export default function SlidePuzzleBoard() {
                   boardData.currentMove < boardData.highscore
                     ? "New Lowest Score"
                     : "Score"
-                } for ${boardData.row}x${boardData.col} board`}
+                } for ${boardData.size}x${boardData.size} board`}
               </p>
               <p className="text-3xl font-bold text-emerald-500">
                 {boardData.currentMove}

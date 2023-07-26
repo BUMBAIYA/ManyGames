@@ -1,13 +1,13 @@
 import { shuffleTiles } from "../../../utility/shuffle";
 
-export function generateRandomTiles(row: number, col: number) {
+export function generateRandomTiles(size: number) {
   let tiles: number[] = [];
-  for (let i = 0; i < row * col; i++) {
+  for (let i = 0; i < size * size; i++) {
     tiles[i] = i;
   }
   const shuffleTile = () => {
     tiles = shuffleTiles(tiles);
-    if (!isSolvable(tiles, row, col)) {
+    if (!isSolvable(tiles, size)) {
       shuffleTile();
     }
   };
@@ -19,7 +19,7 @@ export function getPositionOfEmptyTile(tiles: number[]): number {
   return tiles.indexOf(tiles.length - 1);
 }
 
-function isSolvable(tiles: number[], row: number, col: number) {
+function isSolvable(tiles: number[], size: number) {
   let emptyTileIndex = getPositionOfEmptyTile(tiles);
   const countInversion = () => {
     let inversions = 0;
@@ -38,12 +38,12 @@ function isSolvable(tiles: number[], row: number, col: number) {
     return inversions;
   };
   let inversions = countInversion();
-  let boardSize = row * col;
+  let boardSize = size * size;
   if (boardSize % 2 === 0) {
     if (inversions % 2 === 0) {
-      return Math.floor(emptyTileIndex / col) % 2 !== 0;
+      return Math.floor(emptyTileIndex / size) % 2 !== 0;
     }
-    return Math.floor(emptyTileIndex / col) % 2 === 0;
+    return Math.floor(emptyTileIndex / size) % 2 === 0;
   }
   return inversions % 2 == 0;
 }

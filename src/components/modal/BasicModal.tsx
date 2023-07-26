@@ -30,9 +30,9 @@ export function BasicModal(props: BasicModalProps) {
           <div className="fixed inset-0 bg-zinc-900 bg-opacity-40 dark:bg-zinc-700 dark:bg-opacity-50" />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
+        <div className="fixed inset-0">
           {props.confetti}
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex h-screen items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -44,7 +44,7 @@ export function BasicModal(props: BasicModalProps) {
             >
               <Dialog.Panel
                 className={classNames(
-                  "w-full transform overflow-hidden rounded-xl bg-white p-4 text-left align-middle shadow-xl transition-all dark:bg-zinc-900",
+                  "max-h-[calc(100vh-56px)] w-full transform overflow-y-auto rounded-xl bg-white p-4 text-left align-middle shadow-xl transition-all dark:bg-zinc-900",
                   className ?? "max-w-md",
                 )}
               >
