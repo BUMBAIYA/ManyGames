@@ -17,6 +17,7 @@ import { BasicModal } from "../../modal/BasicModal";
 import { generateRandomTiles, getPositionOfEmptyTile } from "./helper";
 import { splitImageToTiles, verifyImageUrl } from "../../../utility/image";
 import { classNames } from "../../../utility/css";
+import PageMeta from "../../utility/PageMeta";
 
 export const DEFAULT_PUZZLE_IMG_URL = import.meta.env.PROD
   ? "https://manygames.vercel.app/assets/puzzle.jpg"
@@ -206,6 +207,10 @@ export default function SlidePuzzleBoard() {
 
   return (
     <>
+      <PageMeta
+        title="ManyGames | Slide Puzzle"
+        description="Play sliding puzzle online with different levels of difficulties"
+      />
       <canvas ref={canvasRef} className="hidden" />
       <div className="relative flex flex-col justify-center gap-4 xl:flex-row-reverse">
         <div className="flex w-full flex-col justify-between gap-2 xl:w-auto xl:flex-col xl:justify-start">
