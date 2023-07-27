@@ -56,9 +56,10 @@ export default function TestingWordleBoard() {
 
   const getInitialRandomWord = async () => {
     const word = await generateWord();
-    const data = await checkWordIsValid(word);
+    let sanitisedWord = word.replace(/(\r\n|\n|\r)/gm, "");
+    const data = await checkWordIsValid(sanitisedWord);
     if (data) {
-      setWord(word);
+      setWord(sanitisedWord);
       setWordDefination(data.definition);
     }
   };

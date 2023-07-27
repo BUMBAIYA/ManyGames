@@ -50,7 +50,7 @@ export const useDictionaryApi = () => {
             await fetch("/assets/wordle-bank.txt")
               .then((response) => response.text())
               .then((result) => {
-                const wordArr = result.split("\r\n");
+                const wordArr = result.split("\n");
                 let todaysWord =
                   wordArr[Math.floor(Math.random() * wordArr.length)];
                 resolve(todaysWord);
