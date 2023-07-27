@@ -82,11 +82,7 @@ export function SlidePuzzleSettingModal(props: SlidePuzzleSettingModalProps) {
             </RadioGroup.Label>
             <div className="mt-1 grid grid-cols-4 gap-2 sm:grid-cols-4">
               {PUZZLE_SIZES.map((size) => (
-                <RadioGroup.Option
-                  key={size}
-                  value={size}
-                  className={({ active, checked }) => `${checked ? "" : ""}`}
-                >
+                <RadioGroup.Option key={size} value={size}>
                   {({ active, checked }) => (
                     <div
                       style={{

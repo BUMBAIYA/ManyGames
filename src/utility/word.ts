@@ -19,7 +19,7 @@ export type isWordValid = {
 export const useDictionaryApi = () => {
   const dictionaryapi = useMemo(
     () => ({
-      isWordValid(word: string): Promise<isWordValid> {
+      checkWordIsValid(word: string): Promise<isWordValid> {
         return new Promise(async (reslove) => {
           if (word === "" || word === null) {
             reslove(null);
@@ -50,7 +50,7 @@ export const useDictionaryApi = () => {
             await fetch("/assets/wordle-bank.txt")
               .then((response) => response.text())
               .then((result) => {
-                const wordArr = result.split("\n");
+                const wordArr = result.split("\r\n");
                 let todaysWord =
                   wordArr[Math.floor(Math.random() * wordArr.length)];
                 resolve(todaysWord);
@@ -69,3 +69,37 @@ export const useDictionaryApi = () => {
 
   return dictionaryapi;
 };
+
+export function cypherText() {
+  const alphabet = "abcdefghijklmnopqrstuvwxyz";
+  const encryptText = (text: string) => {
+    let encryptedWord = "";
+    for (let i = 0; i < text.length; i++) {
+      const letter = text[i];
+      const index = alphabet.indexOf(letter);
+      if (index !== -1) {
+        const encryptedLetter = alphabet[(index + 1) % alphabet.length];
+        encryptedWord += encryptedLetter;
+      } else {
+        encryptedWord += letter;
+      }
+    }
+    return encryptedWord;
+  };
+  const decryptText = (encryptedText: string) => {
+    let decryptedWord = "";
+    for (let i = 0; i < encryptedText.length; i++) {
+      const letter = encryptedText[i];
+      const index = alphabet.indexOf(letter);
+      if (index !== -1) {
+        const decryptedLetter =
+          alphabet[(index - 1 + alphabet.length) % alphabet.length];
+        decryptedWord += decryptedLetter;
+      } else {
+        decryptedWord += letter;
+      }
+    }
+    return decryptedWord;
+  };
+  return { encryptText, decryptText };
+}
