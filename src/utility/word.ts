@@ -53,7 +53,7 @@ export const useDictionaryApi = () => {
                 const wordArr = result.split("\n");
                 let todaysWord =
                   wordArr[Math.floor(Math.random() * wordArr.length)];
-                resolve(todaysWord);
+                resolve(todaysWord.replace(/\r\n|\r|\n/gm, ""));
               });
           } catch (error) {
             resolve("hello");
@@ -70,7 +70,7 @@ export const useDictionaryApi = () => {
   return dictionaryapi;
 };
 
-export function cypherText() {
+export function useCypherText() {
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
   const encryptText = (text: string) => {
     let encryptedWord = "";

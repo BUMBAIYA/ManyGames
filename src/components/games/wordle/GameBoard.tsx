@@ -10,10 +10,11 @@ import { KeyBoard, KeyBoardResponse } from "./KeyBoard";
 import GameWonLostModal from "../../modal/GameWonLostModal";
 import { WordleHowToPlay } from "./HowToPlay";
 import { useEventListener } from "../../../hooks/useEventListener";
-import { useDictionaryApi } from "../../../utility/word";
+import { useCypherText, useDictionaryApi } from "../../../utility/word";
 import { generateInitialTiles } from "./helper";
 import styles from "./style.module.css";
 import { WordleSettingModal } from "./SettingModal";
+import useLocalStorage from "../../../hooks/useLocalStorage";
 
 export type LetterType = {
   value: string | null;
@@ -24,28 +25,47 @@ export type WordleGameMode = "NORMAL" | "HARD";
 
 export const GAME_MODES = ["NORMAL", "HARD"] as const;
 
+type WordleBoardState = {
+  w: string;
+  wl: string[];
+  m: WordleGameMode;
+  ct: number;
+  cu: number;
+};
+
 const TOTAL_ATTEMPT = 6 as const;
 const WORD_LENGTH = 5 as const;
 
 export default function TestingWordleBoard() {
   const refNotValidText = useRef<HTMLDivElement>(null);
-  const [word, setWord] = useState<string>("hello");
+  const [word, setWord] = useState<string>("");
   const [wordToTest, setWordToTest] = useState<string>("");
-  const [mode, setMode] = useState<WordleGameMode>("NORMAL");
-  const [wordDefination, setWordDefination] = useState<string>(
-    "Used as a greeting or to begin a phone conversation",
-  );
+  const [wordDefination, setWordDefination] = useState<string>("");
+
+  const [wrongGuessedLetters, setWrongGuessedLetters] = useState<string[]>([]);
 
   const [isWon, setIsWon] = useState<boolean>(false);
   const [isLost, setIsLost] = useState<boolean>(false);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [boardTiles, setBoardTiles] = useState<LetterType[][]>(
+
+  const [boardState, setBoardState] = useLocalStorage(
+    "wordle-state",
     generateInitialTiles(TOTAL_ATTEMPT, WORD_LENGTH),
   );
 
-  const [currentAttempt, setCurrentAttempt] = useState<number>(0);
-  const [cursorAt, setCursorAt] = useState<number>(0);
-  const [wrongGuessedLetters, setWorngGuessedLetters] = useState<string[]>([]);
+  const { encryptText, decryptText } = useCypherText();
+
+  const [boardData, setBoardData] = useLocalStorage<WordleBoardState>(
+    "wordle-data",
+    {
+      w: "",
+      wl: [],
+      m: "NORMAL",
+      ct: 0,
+      cu: 0,
+    },
+  );
+
   const [wrongGuessedWords, setWrongGuessedWords] = useState<string[]>([]);
   const [validGuessedWords, setValidGuessedWords] = useState<string[]>([]);
 
@@ -54,18 +74,44 @@ export default function TestingWordleBoard() {
 
   const { checkWordIsValid, generateWord } = useDictionaryApi();
 
-  const getInitialRandomWord = async () => {
-    const word = await generateWord();
-    let sanitisedWord = word.replace(/(\r\n|\n|\r)/gm, "");
-    const data = await checkWordIsValid(sanitisedWord);
-    if (data) {
-      setWord(sanitisedWord);
-      setWordDefination(data.definition);
+  const getInitialRandomWord = async (type: "initial" | "reset") => {
+    if (type === "initial") {
+      if (boardData.w.length !== 0) {
+        let word = decryptText(boardData.w);
+        const data = await checkWordIsValid(word);
+        if (data) {
+          setWord(word);
+          setWordDefination(data.definition);
+          return;
+        }
+      } else {
+        let word = await generateWord();
+        const data = await checkWordIsValid(word);
+        if (data) {
+          setWord(word);
+          setWordDefination(data.definition);
+          setBoardData((prev) => {
+            return { ...prev, w: encryptText(word) };
+          });
+          return;
+        }
+      }
+    } else {
+      let word = await generateWord();
+      let data = await checkWordIsValid(word);
+      if (data) {
+        setWord(word);
+        setWordDefination(data.definition);
+        setBoardData((prev) => {
+          return { ...prev, w: encryptText(word), wl: [], ct: 0, cu: 0 };
+        });
+        return;
+      }
     }
   };
 
   const getCursorPosition = () => {
-    return [currentAttempt, cursorAt - currentAttempt * WORD_LENGTH];
+    return [boardData.ct, boardData.cu - boardData.ct * WORD_LENGTH];
   };
 
   const handleShowError = () => {
@@ -76,18 +122,9 @@ export default function TestingWordleBoard() {
   };
 
   const handleCorrectWordChange = () => {
-    if (mode === "HARD") {
-      setWorngGuessedLetters((prev) => [
-        ...prev,
-        ...Array.from(new Set(wordToTest)).filter(
-          (letter) =>
-            !word.includes(letter) && !wrongGuessedLetters.includes(letter),
-        ),
-      ]);
-    }
-    setBoardTiles((prevTiles) => {
+    setBoardState((prevTiles) => {
       return prevTiles.map((rowArr, rIndex) =>
-        rIndex === currentAttempt
+        rIndex === boardData.ct
           ? rowArr.map((letter, cIndex) => {
               if (
                 word[cIndex].toLocaleLowerCase() ===
@@ -112,14 +149,31 @@ export default function TestingWordleBoard() {
       return;
     } else {
     }
-    if (wordToTest !== word && currentAttempt === 5) {
+    if (wordToTest !== word && boardData.ct === 5) {
       setIsLost(true);
       setTimeout(() => {
         setIsOpenModal(true);
       }, 1000);
       return;
     }
-    setCurrentAttempt((prev) => prev + 1);
+    if (boardData.m === "HARD") {
+      setBoardData((prev) => {
+        return {
+          ...prev,
+          ct: prev.ct + 1,
+          wl: [
+            ...prev.wl,
+            ...Array.from(new Set(wordToTest)).filter(
+              (letter) => !word.includes(letter),
+            ),
+          ],
+        };
+      });
+    } else {
+      setBoardData((prev) => {
+        return { ...prev, ct: prev.ct + 1 };
+      });
+    }
   };
 
   const checkWordValidity = async () => {
@@ -132,20 +186,20 @@ export default function TestingWordleBoard() {
         setWrongGuessedWords((prev) => [...prev, wordToTest]);
         handleShowError();
       } else {
-        setValidGuessedWords((prev) => [...prev, wordToTest]);
         handleCorrectWordChange();
+        setValidGuessedWords((prev) => [...prev, wordToTest]);
       }
     }
   };
 
   const onKeyPressed = (key: string) => {
     if (isLost || isWon) return;
-    if (cursorAt >= WORD_LENGTH * (currentAttempt + 1)) return;
-    if (mode === "HARD") {
-      if (wrongGuessedLetters.includes(key)) return;
+    if (boardData.cu >= WORD_LENGTH * (boardData.ct + 1)) return;
+    if (boardData.m === "HARD") {
+      if (boardData.wl.includes(key)) return;
     }
     let cursorPos = getCursorPosition();
-    setBoardTiles((prevTiles) => {
+    setBoardState((prevTiles) => {
       return prevTiles.map((rowArr, rIndex) =>
         rIndex === cursorPos[0]
           ? rowArr.map((letter, cIndex) =>
@@ -154,16 +208,18 @@ export default function TestingWordleBoard() {
           : rowArr,
       );
     });
-    setCursorAt((prev) => prev + 1);
+    setBoardData((prev) => {
+      return { ...prev, cu: prev.cu + 1 };
+    });
     setWordToTest((prev) => prev.concat(key));
   };
 
   const onBackspace = () => {
-    if (cursorAt === 0) return;
+    if (boardData.cu === 0) return;
     if (isLost || isWon) return;
-    if (cursorAt <= currentAttempt * WORD_LENGTH) return;
+    if (boardData.cu <= boardData.ct * WORD_LENGTH) return;
     let cursorPos = getCursorPosition();
-    setBoardTiles((prevTiles) => {
+    setBoardState((prevTiles) => {
       return prevTiles.map((rowArr, rIndex) =>
         rIndex === cursorPos[0]
           ? rowArr.map((letter, cIndex) =>
@@ -172,14 +228,16 @@ export default function TestingWordleBoard() {
           : rowArr,
       );
     });
-    setCursorAt((prev) => prev - 1);
+    setBoardData((prev) => {
+      return { ...prev, cu: prev.cu - 1 };
+    });
     setWordToTest((prev) => prev.substring(0, prev.length - 1));
   };
 
   const onEnter = () => {
-    if (cursorAt === 0) return;
+    if (boardData.cu === 0) return;
     if (isLost || isWon) return;
-    if (cursorAt % WORD_LENGTH === 0 && wordToTest.length === WORD_LENGTH) {
+    if (boardData.cu % WORD_LENGTH === 0 && wordToTest.length === WORD_LENGTH) {
       if (wrongGuessedWords.includes(wordToTest)) {
         handleShowError();
         return;
@@ -219,25 +277,24 @@ export default function TestingWordleBoard() {
   const resetGame = () => {
     setIsWon(false);
     setIsLost(false);
-    setCurrentAttempt(0);
-    setCursorAt(0);
     setWordToTest("");
-    setWorngGuessedLetters([]);
-    setBoardTiles(generateInitialTiles(TOTAL_ATTEMPT, WORD_LENGTH));
-    getInitialRandomWord();
+    setBoardState(generateInitialTiles(TOTAL_ATTEMPT, WORD_LENGTH));
+    getInitialRandomWord("reset");
   };
 
   const handleResetGame = () => {
-    if (currentAttempt === 0 && !isWon) return;
+    if (boardData.ct === 0 && !isWon) return;
     resetGame();
   };
 
   const handleUpdateMode = (mode: WordleGameMode) => {
-    setMode(mode);
+    setBoardData((prev) => {
+      return { ...prev, m: mode };
+    });
   };
 
   useEffect(() => {
-    getInitialRandomWord();
+    getInitialRandomWord("initial");
   }, []);
 
   return (
@@ -262,8 +319,8 @@ export default function TestingWordleBoard() {
             <Cog6ToothIcon className="block h-6 w-6 text-white dark:text-zinc-900" />
           </button>
           <WordleSettingModal
-            mode={mode}
-            currentAttempt={currentAttempt}
+            mode={boardData.m}
+            currentAttempt={boardData.ct}
             isOpen={openSettingModal}
             closeModal={setOpenSettingModal}
             submit={handleUpdateMode}
@@ -291,7 +348,7 @@ export default function TestingWordleBoard() {
               Invalid word
             </span>
           </div>
-          {boardTiles.map((row, rIndex) => {
+          {boardState.map((row, rIndex) => {
             return (
               <div key={rIndex} className="flex flex-row gap-1">
                 {row.map((letter, cIndex) => {
@@ -311,7 +368,7 @@ export default function TestingWordleBoard() {
         </div>
       </div>
       <div>
-        <KeyBoard getValue={handleKeyDown} disabledKeys={wrongGuessedLetters} />
+        <KeyBoard getValue={handleKeyDown} disabledKeys={boardData.wl} />
       </div>
       {isWon !== null && (
         <GameWonLostModal
@@ -332,14 +389,16 @@ export default function TestingWordleBoard() {
           <div className="mt-2">
             <div className="text-sm text-gray-500">
               Definition{" "}
-              <span className="text-md font-semibold text-emerald-500">
-                "
-                {wordDefination.replace(
-                  wordDefination[0],
-                  wordDefination[0].toLocaleUpperCase(),
-                )}
-                "
-              </span>
+              {wordDefination && (
+                <span className="text-md font-semibold text-emerald-500">
+                  "
+                  {wordDefination.replace(
+                    wordDefination[0],
+                    wordDefination[0].toLocaleUpperCase(),
+                  )}
+                  "
+                </span>
+              )}
             </div>
           </div>
         </GameWonLostModal>
