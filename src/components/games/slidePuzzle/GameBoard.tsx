@@ -18,6 +18,7 @@ import { generateRandomTiles, getPositionOfEmptyTile } from "./helper";
 import { splitImageToTiles, verifyImageUrl } from "../../../utility/image";
 import { classNames } from "../../../utility/css";
 import PageMeta from "../../utility/PageMeta";
+import { PuzzleHowToPlay } from "./HowToPlay";
 
 export const DEFAULT_PUZZLE_IMG_URL = import.meta.env.PROD
   ? "https://manygames.vercel.app/assets/puzzle.jpg"
@@ -25,7 +26,7 @@ export const DEFAULT_PUZZLE_IMG_URL = import.meta.env.PROD
 
 export const PUZZLE_SIZES = [3, 4, 5, 6] as const;
 
-type MoveDirection = "UP" | "DOWN" | "RIGHT" | "LEFT";
+export type MoveDirection = "UP" | "DOWN" | "RIGHT" | "LEFT";
 
 type SlidePuzzleData = {
   size: number;
@@ -36,7 +37,7 @@ type SlidePuzzleData = {
 
 export default function SlidePuzzleBoard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
+  const [aspectRatio, setAspectRatio] = useState<number>(1);
   const [isError, setIsError] = useState<boolean>(false);
   const [isBoardBuilding, setIsBoardBuilding] = useState<boolean>(true);
   const [isWon, setIsWon] = useState<boolean>(false);
@@ -68,13 +69,14 @@ export default function SlidePuzzleBoard() {
     let imageValidity = false;
     imageValidity = await verifyImageUrl(imageUrl);
     if (imageValidity) {
-      const tileImages = await splitImageToTiles(
+      const splitImageResponse = await splitImageToTiles(
         imageUrl,
         canvasRef,
         size,
         size,
       );
-      setImageTiles(tileImages);
+      setImageTiles(splitImageResponse.images);
+      setAspectRatio(splitImageResponse.aspectRatio);
     } else {
       setIsError(true);
     }
@@ -218,8 +220,8 @@ export default function SlidePuzzleBoard() {
         description="Play sliding puzzle online with different levels of difficulties"
       />
       <canvas ref={canvasRef} className="hidden" />
-      <div className="relative flex flex-col justify-center gap-4 xl:flex-row-reverse">
-        <div className="flex w-full flex-col justify-between gap-2 xl:w-auto xl:flex-col xl:justify-start">
+      <div className="relative flex flex-col justify-center gap-4 lg:flex-row-reverse">
+        <div className="flex w-full flex-col justify-between gap-2 lg:w-auto lg:flex-col lg:justify-start">
           <div className="flex w-full justify-end">
             <button
               onClick={() => setOpenInfoModal(true)}
@@ -229,27 +231,19 @@ export default function SlidePuzzleBoard() {
             >
               <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
             </button>
-            <BasicModal
-              title="How to Play"
-              isOpen={openInfoModal}
-              closeModal={setOpenInfoModal}
-              className="max-w-xl"
-            >
-              <div className="mt-2 flex w-full flex-col justify-center gap-2 border-t border-emerald-500 p-4 text-black dark:text-white">
-                <span className="font-base w-full text-sm leading-relaxed">
-                  Welcome to our exciting puzzle game! Your goal is to complete
-                  the given image by moving the puzzle pieces around. Challenge
-                  yourself by adjusting the difficulty level in the settings. As
-                  you play the game. You can preview the puzzle using preview
-                  option in the game. Get ready to test your wits and have fun
-                  piecing together the images in this engaging and brain-teasing
-                  game! Happy puzzling!
-                </span>
-              </div>
-            </BasicModal>
+            {openInfoModal && (
+              <PuzzleHowToPlay
+                isOpen={openInfoModal}
+                closeModal={setOpenInfoModal}
+                size={boardData.size}
+                imageTiles={imageTiles}
+                aspectRatio={aspectRatio}
+                className="max-w-4xl"
+              />
+            )}
           </div>
-          <div className="flex w-full justify-between gap-2 xl:flex-col">
-            <div className="flex w-full flex-row gap-2 md:w-auto xl:flex-col">
+          <div className="flex w-full justify-between gap-2 lg:flex-col">
+            <div className="flex w-full flex-row gap-2 md:w-auto lg:flex-col">
               <div className="inline rounded-md bg-emerald-400/10 px-2 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 md:px-4 lg:w-full">
                 <span className="text-xs sm:text-base">Moves</span>
                 <p className="text-base font-semibold sm:text-3xl">
@@ -263,7 +257,7 @@ export default function SlidePuzzleBoard() {
                 </p>
               </div>
             </div>
-            <div className="flex h-min gap-2 xl:flex-1 xl:flex-col">
+            <div className="flex h-min gap-2 lg:flex-1 lg:flex-col">
               <button
                 className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4 lg:w-full"
                 aria-label="preview puzzle"
@@ -278,7 +272,7 @@ export default function SlidePuzzleBoard() {
                 title="Puzzle preview"
                 isOpen={openPreviewModal}
                 closeModal={setOpenPreviewModal}
-                className="max-w-2xl"
+                className="max-w-fit"
                 imageUrl={boardData.imageUrl}
               />
               <button
@@ -301,53 +295,61 @@ export default function SlidePuzzleBoard() {
                 </span>
                 <Cog6ToothIcon className="block h-6 w-6 text-white dark:text-zinc-900 sm:hidden" />
               </button>
-              <SlidePuzzleSettingModal
-                isOpen={openSettingModal}
-                closeModal={setOpenSettingModal}
-                imageUrl={boardData.imageUrl}
-                size={boardData.size}
-                submit={handleUpatePuzzle}
-              />
+              {openSettingModal && (
+                <SlidePuzzleSettingModal
+                  isOpen={openSettingModal}
+                  closeModal={setOpenSettingModal}
+                  imageUrl={boardData.imageUrl}
+                  size={boardData.size}
+                  submit={handleUpatePuzzle}
+                />
+              )}
             </div>
           </div>
         </div>
         {isError && <ErrorMessage />}
-        {isError ? null : isBoardBuilding ? (
-          <BuildingBoardLoader />
-        ) : (
-          <div
-            {...touchSwipeHandlers}
-            className={classNames(
-              isWon ? "" : "gap-[2px] sm:gap-1",
-              "grid w-full max-w-3xl select-none rounded-sm bg-zinc-900 p-[2px] dark:bg-emerald-800 sm:rounded-md sm:p-1",
-            )}
-            style={{
-              gridTemplateColumns: `repeat(${boardData.size}, minmax(0, 1fr))`,
-              gridTemplateRows: `repeat(${boardData.size}, minmax(0, 1fr))`,
-            }}
-          >
-            {tiles.map((_tile, index) => {
-              if (index === emptyTileIndex && !isWon) {
+        <div className="flex w-full justify-center lg:w-auto">
+          {isError ? null : isBoardBuilding ? (
+            <BuildingBoardLoader />
+          ) : (
+            <div
+              {...touchSwipeHandlers}
+              className={classNames(
+                isWon ? "" : "gap-[2px] sm:gap-1",
+                aspectRatio < 1
+                  ? "h-[calc(100vh-250px)] lg:h-[calc(100vh-200px)]"
+                  : "w-full",
+                "grid max-w-3xl select-none rounded-sm bg-zinc-900 p-[2px] dark:bg-emerald-800 sm:rounded-md sm:p-1",
+              )}
+              style={{
+                gridTemplateColumns: `repeat(${boardData.size}, minmax(0, 1fr))`,
+                gridTemplateRows: `repeat(${boardData.size}, minmax(0, 1fr))`,
+                aspectRatio,
+              }}
+            >
+              {tiles.map((_tile, index) => {
+                if (index === emptyTileIndex && !isWon) {
+                  return (
+                    <div
+                      key={index}
+                      className="h-full w-full rounded-sm bg-white text-black dark:bg-zinc-900"
+                    ></div>
+                  );
+                }
                 return (
-                  <div
+                  <img
+                    src={imageTiles[_tile]}
                     key={index}
-                    className="h-full w-full rounded-sm bg-white text-black dark:bg-zinc-900"
-                  ></div>
+                    className={classNames(
+                      isWon ? "" : "rounded-sm",
+                      "pointer-events-none h-full w-full select-none bg-cover bg-no-repeat",
+                    )}
+                  />
                 );
-              }
-              return (
-                <img
-                  src={imageTiles[_tile]}
-                  key={index}
-                  className={classNames(
-                    isWon ? "" : "rounded-sm",
-                    "pointer-events-none h-full w-full select-none bg-cover bg-no-repeat",
-                  )}
-                />
-              );
-            })}
-          </div>
-        )}
+              })}
+            </div>
+          )}
+        </div>
         {isWon && (
           <GameWonLostModal
             isOpen={openWonModal}

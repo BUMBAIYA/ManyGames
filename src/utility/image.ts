@@ -9,12 +9,17 @@ export function verifyImageUrl(url: string): Promise<boolean> {
   });
 }
 
+export type splitImageToTilesResponse = {
+  aspectRatio: number;
+  images: string[];
+};
+
 export function splitImageToTiles(
   imageUrl: string,
   canvasRef: RefObject<HTMLCanvasElement>,
   row: number,
   col: number,
-): Promise<string[]> {
+): Promise<splitImageToTilesResponse> {
   return new Promise((resolve) => {
     const canvas = canvasRef.current!;
     const ctx = canvas?.getContext("2d")!;
@@ -22,12 +27,12 @@ export function splitImageToTiles(
     image.setAttribute("crossOrigin", "anonymous");
     image.src = imageUrl;
     image.onload = () => {
-      var imagewidth = image.width;
-      var imageHeight = image.height;
+      let imagewidth = image.width;
+      let imageHeight = image.height;
       canvas.width = imagewidth;
       canvas.height = imageHeight;
-      var splitHeight = Math.floor(imageHeight / row);
-      var splitWidth = Math.floor(imagewidth / col);
+      let splitHeight = Math.floor(imageHeight / row);
+      let splitWidth = Math.floor(imagewidth / col);
       ctx.drawImage(image, 0, 0);
       const tileCanvases = [];
       for (let y = 0; y < splitHeight * row; y += splitHeight) {
@@ -39,7 +44,7 @@ export function splitImageToTiles(
           tileCanvases.push(tileCanvas.toDataURL());
         }
       }
-      resolve(tileCanvases);
+      resolve({ images: tileCanvases, aspectRatio: splitWidth / splitHeight });
     };
   });
 }
