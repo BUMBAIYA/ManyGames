@@ -303,20 +303,20 @@ export default function TestingWordleBoard() {
       <div className="flex flex-col gap-4 lg:flex-row-reverse">
         <div className="flex w-full justify-end gap-2 lg:flex-col-reverse">
           <button
-            aria-label="reset game"
-            type="button"
-            className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400  dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4"
+            aria-label="How to play"
             onClick={handleResetGame}
+            type="button"
+            className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
           >
-            <ArrowPathIcon className="block h-6 w-6 text-white dark:text-zinc-900" />
+            <ArrowPathIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
           </button>
           <button
-            aria-label="game setting"
-            type="button"
-            className="rounded-md bg-zinc-900 p-2 shadow-sm transition-colors duration-100 ease-in hover:bg-zinc-700 dark:bg-emerald-400  dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 dark:hover:bg-emerald-400/80 dark:hover:ring-emerald-400 sm:px-4"
+            aria-label="How to play"
             onClick={() => setOpenSettingModal(true)}
+            type="button"
+            className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
           >
-            <Cog6ToothIcon className="block h-6 w-6 text-white dark:text-zinc-900" />
+            <Cog6ToothIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
           </button>
           <WordleSettingModal
             mode={boardData.m}
