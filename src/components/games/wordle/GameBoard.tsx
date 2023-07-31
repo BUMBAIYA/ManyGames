@@ -7,14 +7,15 @@ import {
 import PageMeta from "../../utility/PageMeta";
 import { WorldLetter } from "./WordleLetter";
 import { KeyBoard, KeyBoardResponse } from "./KeyBoard";
-import GameWonLostModal from "../../modal/GameWonLostModal";
+import useLocalStorage from "../../../hooks/useLocalStorage";
+import { WordleSettingModal } from "./SettingModal";
+import { BasicModal } from "../../modal/BasicModal";
 import { WordleHowToPlay } from "./HowToPlay";
+import ConfettiComponent from "../../modal/ConfettiComponent";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { useCypherText, useDictionaryApi } from "../../../utility/word";
 import { generateInitialTiles } from "./helper";
 import styles from "./style.module.css";
-import { WordleSettingModal } from "./SettingModal";
-import useLocalStorage from "../../../hooks/useLocalStorage";
 
 export type LetterType = {
   value: string | null;
@@ -41,8 +42,6 @@ export default function TestingWordleBoard() {
   const [word, setWord] = useState<string>("");
   const [wordToTest, setWordToTest] = useState<string>("");
   const [wordDefination, setWordDefination] = useState<string>("");
-
-  const [wrongGuessedLetters, setWrongGuessedLetters] = useState<string[]>([]);
 
   const [isWon, setIsWon] = useState<boolean>(false);
   const [isLost, setIsLost] = useState<boolean>(false);
@@ -371,10 +370,11 @@ export default function TestingWordleBoard() {
         <KeyBoard getValue={handleKeyDown} disabledKeys={boardData.wl} />
       </div>
       {isWon !== null && (
-        <GameWonLostModal
+        <BasicModal
+          title={isWon ? "You won" : "You Lost"}
           isOpen={isOpenModal}
           closeModal={setIsOpenModal}
-          isWon={isWon ? true : false}
+          confetti={isWon && <ConfettiComponent />}
         >
           <div className="mt-4">
             <div className="text-md mb-1 text-gray-500">
@@ -387,7 +387,7 @@ export default function TestingWordleBoard() {
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-sm text-gray-500">
+            <div className="text-base text-gray-500">
               Definition{" "}
               {wordDefination && (
                 <span className="text-md font-semibold text-emerald-500">
@@ -401,7 +401,7 @@ export default function TestingWordleBoard() {
               )}
             </div>
           </div>
-        </GameWonLostModal>
+        </BasicModal>
       )}
     </div>
   );
