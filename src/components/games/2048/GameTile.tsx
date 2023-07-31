@@ -1,11 +1,19 @@
-import { GameTile } from "./GameLogic";
 import styles from "./styles.module.scss";
 
-type NewTileProps = {
+export type GameTile = {
+  value: number;
+  row: number;
+  column: number;
+  oldRow: number;
+  oldColumn: number;
+  mergeToTile: GameTile | null;
+};
+
+export type NewGameTileProps = {
   tile: GameTile;
 };
 
-const colorss: any = {
+const colors: any = {
   2: "bg-emerald-200 text-emerald-800 dark:text-emerald-800",
   4: "bg-emerald-300 text-emerald-800",
   8: "bg-emerald-400 text-emerald-800",
@@ -19,24 +27,59 @@ const colorss: any = {
   2048: "bg-blue-600 text-white",
 };
 
-export default function NewTile({ tile }: NewTileProps) {
-  let classArray: string[] = [
-    `${styles.tile} inline-flex items-center justify-center font-bold w-[76px] h-[76px] rounded-md sm:w-32 sm:h-32 border border-emerald-600 dark:border-none text-3xl sm:text-5xl`,
-  ];
-  classArray.push(colorss[tile.value]);
-  if (!tile.mergeToTile)
-    classArray.push(`${styles[`position_${tile.row}_${tile.column}`]}`);
-  else classArray.push(`${styles.merged}`);
-  if (tile.isNew()) classArray.push(`${styles.new}`);
-  if (tile.hasMoved()) {
-    classArray.push(
-      `${styles[`row_from_${tile.fromRow()}_to_${tile.toRow()}`]}`,
+export function NewGameTile({ tile }: NewGameTileProps) {
+  const { column, mergeToTile, oldColumn, oldRow, row, value } = tile;
+
+  const isNew = () => {
+    return (oldRow === -1 || oldColumn === -1) && !mergeToTile;
+  };
+
+  const fromRow = () => {
+    if (mergeToTile !== null) return row;
+    return oldRow;
+  };
+
+  const fromColumn = () => {
+    if (mergeToTile !== null) return column;
+    return oldColumn;
+  };
+
+  const toRow = () => {
+    if (mergeToTile !== null) return mergeToTile.row;
+    return row;
+  };
+
+  const toColumn = () => {
+    if (mergeToTile !== null) return mergeToTile.column;
+    return column;
+  };
+
+  const hasMoved = () => {
+    return (
+      (fromRow() !== -1 &&
+        (fromRow() !== toRow() || fromColumn() !== toColumn())) ||
+      mergeToTile
     );
+  };
+
+  let classArray: string[] = [
+    `${styles.tile} inline-flex h-[22vw] w-[22vw] sm:w-[18vh] sm:h-[18vh] items-center justify-center font-bold rounded-[1.5vw] sm:rounded-[1vh] border border-emerald-600 dark:border-none text-[8vw] sm:text-[7vh]`,
+  ];
+  classArray.push(colors[value]);
+  if (!mergeToTile) classArray.push(`${styles[`pos_${row}_${column}`]}`);
+  else classArray.push(`${styles.merged}`);
+  if (isNew()) classArray.push(`${styles.new}`);
+  if (hasMoved()) {
+    classArray.push(`${styles[`row_from_${fromRow()}_to_${toRow()}`]}`);
     classArray.push(
-      `${styles[`column_from_${tile.fromColumn()}_to_${tile.toColumn()}`]}`,
+      `${styles[`column_from_${fromColumn()}_to_${toColumn()}`]}`,
     );
     classArray.push(`${styles.isMoving}`);
   }
   let classes = classArray.join(" ");
-  return <div className={classes}>{tile.value}</div>;
+  return (
+    <div style={mergeToTile ? { zIndex: -1 } : {}} className={classes}>
+      {value}
+    </div>
+  );
 }

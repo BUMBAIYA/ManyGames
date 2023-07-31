@@ -1,3 +1,8 @@
+.gameBoard {
+  --tile-size: 22vw;
+  --tile-gap: 1vw;
+}
+
 .tile {
   user-select: none;
   cursor: default;
@@ -11,13 +16,7 @@
 .tile.merged.isMoving {
   display: inline-flex;
 }
-.tile.new {
-  animation-duration: 0.2s;
-  animation-name: newTile;
-  animation-fill-mode: forwards;
-  animation-delay: 0.15s;
-  transform: scale(0);
-}
+
 @keyframes newTile {
   from {
     transform: scale(0);
@@ -27,67 +26,51 @@
   }
 }
 
+.tile.new {
+  animation-duration: 0.2s;
+  animation-name: newTile;
+  animation-fill-mode: forwards;
+  animation-delay: 0.15s;
+  transform: scale(0);
+}
+
+@media screen and (width >= 640px) {
+  .gameBoard {
+    --tile-size: 18vh;
+    --tile-gap: 1vh;
+  }
+}
+
 @for $row from 0 through 3 {
   @for $column from 0 through 3 {
-    @media (width < 640px) {
-      .position_#{$row}_#{$column}:not(.isMoving) {
-        top: $row * 5rem;
-        left: $column * 5rem;
-      }
-    }
-    @media (640px <= width) {
-      .position_#{$row}_#{$column}:not(.isMoving) {
-        top: $row * 8.5rem;
-        left: $column * 8.5rem;
-      }
+    .pos_#{$row}_#{$column}:not(.isMoving) {
+      top: calc($row * calc(var(--tile-gap) + var(--tile-size)));
+      left: calc($column * calc(var(--tile-gap) + var(--tile-size)));
     }
   }
 }
+
 @for $fromRow from 0 through 3 {
   @for $toRow from 0 through 3 {
     $name: row_from_#{$fromRow}_to_#{$toRow};
 
-    @media (width < 640px) {
-      @if $fromRow == $toRow {
-        .#{$name} {
-          top: $toRow * 5rem;
-        }
-      } @else {
-        .#{$name} {
-          animation-duration: 0.2s;
-          animation-name: $name;
-          animation-fill-mode: forwards;
-        }
-
-        @keyframes #{$name} {
-          from {
-            top: $fromRow * 5rem;
-          }
-          to {
-            top: $toRow * 5rem;
-          }
-        }
+    @if $fromRow == $toRow {
+      .#{$name} {
+        top: calc($toRow * calc(var(--tile-gap) + var(--tile-size)));
       }
-    }
-    @media (640px <= width) {
-      @if $fromRow == $toRow {
-        .#{$name} {
-          top: $toRow * 8.5rem;
-        }
-      } @else {
-        .#{$name} {
-          animation-duration: 0.2s;
-          animation-name: $name;
-          animation-fill-mode: forwards;
-        }
+    } @else {
+      .#{$name} {
+        animation-duration: 0.2s;
+        animation-name: $name;
+        animation-fill-mode: forwards;
+      }
 
-        @keyframes #{$name} {
-          from {
-            top: $fromRow * 8.5rem;
-          }
-          to {
-            top: $toRow * 8.5rem;
-          }
+      @keyframes #{$name} {
+        from {
+          top: calc($fromRow * calc(var(--tile-gap) + var(--tile-size)));
+        }
+        to {
+          top: calc($toRow * calc(var(--tile-gap) + var(--tile-size)));
         }
       }
     }
@@ -97,47 +80,23 @@
   @for $toColumn from 0 through 3 {
     $name: column_from_#{$fromColumn}_to_#{$toColumn};
 
-    @media (width < 640px) {
-      @if $fromColumn == $toColumn {
-        .#{$name} {
-          left: $toColumn * 5rem;
-        }
-      } @else {
-        .#{$name} {
-          animation-duration: 0.2s;
-          animation-name: $name;
-          animation-fill-mode: forwards;
-        }
-
-        @keyframes #{$name} {
-          from {
-            left: $fromColumn * 5rem;
-          }
-          to {
-            left: $toColumn * 5rem;
-          }
-        }
+    @if $fromColumn == $toColumn {
+      .#{$name} {
+        left: calc($toColumn * calc(var(--tile-gap) + var(--tile-size)));
       }
-    }
-    @media (640px <= width) {
-      @if $fromColumn == $toColumn {
-        .#{$name} {
-          left: $toColumn * 8.5rem;
-        }
-      } @else {
-        .#{$name} {
-          animation-duration: 0.2s;
-          animation-name: $name;
-          animation-fill-mode: forwards;
-        }
+    } @else {
+      .#{$name} {
+        animation-duration: 0.2s;
+        animation-name: $name;
+        animation-fill-mode: forwards;
+      }
 
-        @keyframes #{$name} {
-          from {
-            left: $fromColumn * 8.5rem;
-          }
-          to {
-            left: $toColumn * 8.5rem;
-          }
+      @keyframes #{$name} {
+        from {
+          left: calc($fromColumn * calc(var(--tile-gap) + var(--tile-size)));
+        }
+        to {
+          left: calc($toColumn * calc(var(--tile-gap) + var(--tile-size)));
         }
       }
     }

@@ -1,43 +1,168 @@
-import { useState } from "react";
-import { Board } from "./GameLogic";
-import useEvent from "../../../hooks/useEvent";
-import GameTile from "./GameTile";
-import GameDetails from "./GameDetails";
-import GameWonLostModal from "../../modal/GameWonLostModal";
-import useLocalStorage from "../../../hooks/useLocalStorage";
-import PageMeta from "../../utility/PageMeta";
+import { useEffect, useReducer, useState } from "react";
+import { ArrowPathIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { useSwipeable } from "react-swipeable";
+import PageMeta from "../../utility/PageMeta";
+import { GameTile, NewGameTile } from "./GameTile";
+import useEvent from "../../../hooks/useEvent";
+import useLocalStorage from "../../../hooks/useLocalStorage";
+import {
+  addRandomTile,
+  generateInitialCells,
+  isGameLost,
+  moveTile,
+  setPositions,
+} from "./helper";
+import styles from "./styles.module.scss";
 import { BasicModal } from "../../modal/BasicModal";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import ConfettiComponent from "../../modal/ConfettiComponent";
 
-enum MoveDirection {
+export const initialTileState: GameTile = {
+  value: 0,
+  row: -1,
+  column: -1,
+  oldRow: -1,
+  oldColumn: -1,
+  mergeToTile: null,
+};
+
+type ReducerState = {
+  board: GameTile[][];
+  tiles: GameTile[];
+  won: boolean;
+  lost: boolean;
+  score: number;
+};
+
+type ReducerActions =
+  | {
+      type: "INITIAL";
+    }
+  | {
+      type: "RESTORE";
+    }
+  | {
+      type: GameMovement;
+    };
+
+type GameMovement = "UP" | "DOWN" | "RIGHT" | "LEFT";
+
+export enum MoveDirection {
   UP = 1,
   DOWN = 3,
   RIGHT = 2,
   LEFT = 0,
 }
 
+export const PROBABILITY = 0.4 as const;
+export const BOARD_SIZE = 4 as const;
+
+const initialReducerState: ReducerState = {
+  board: generateInitialCells(),
+  tiles: [],
+  won: false,
+  lost: false,
+  score: 0,
+};
+
+const generateInitialGameState = (): ReducerState => {
+  let newCells = generateInitialCells();
+  newCells = addRandomTile(newCells);
+  newCells = addRandomTile(newCells);
+  newCells = setPositions(newCells);
+  return { ...initialReducerState, board: newCells };
+};
+
 export default function GameBoard() {
-  const [openInfoModal, setOpenInfoModal] = useState<boolean>(false);
-  const [board, setBoard] = useState(new Board());
-  const [openWonModal, setOpenWonModal] = useState<boolean>(true);
-  const [highScore, setHighScore] = useLocalStorage<number>(
-    "2048-highscore",
-    0,
-  );
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [boardStore, setBoardStore] = useLocalStorage("2048-data", {
+    won: false,
+    lost: false,
+    board: generateInitialGameState().board,
+    score: 0,
+    highscore: 0,
+  });
 
-  const getClonedBoard = (): Board => {
-    return Object.assign(Object.create(Object.getPrototypeOf(board)), board);
-  };
+  const stateReducer = (state: ReducerState, action: ReducerActions) => {
+    switch (action.type) {
+      case "INITIAL": {
+        setOpenModal(false);
+        return generateInitialGameState();
+      }
+      case "RESTORE": {
+        return {
+          won: boardStore.won,
+          lost: boardStore.lost,
+          board: boardStore.board,
+          score: boardStore.score,
+          tiles: [],
+        };
+      }
+      case "UP": {
+        let moveOut = moveTile(state.board, MoveDirection.UP);
+        let lost = isGameLost(moveOut.cells);
+        return {
+          ...state,
+          board: moveOut.cells,
+          lost,
+          won: moveOut.won,
+          score: state.score + moveOut.score,
+          tiles: moveOut.tiles,
+        };
+      }
+      case "DOWN": {
+        let moveOut = moveTile(state.board, MoveDirection.DOWN);
+        let lost = isGameLost(moveOut.cells);
 
-  const handleMoveTile = (dir: MoveDirection) => {
-    setBoard(getClonedBoard().move(dir));
-  };
-
-  const handleHighScore = () => {
-    if (board.score > highScore) {
-      setHighScore(board.score);
+        return {
+          ...state,
+          board: moveOut.cells,
+          lost,
+          won: moveOut.won,
+          score: state.score + moveOut.score,
+          tiles: moveOut.tiles,
+        };
+      }
+      case "RIGHT": {
+        let moveOut = moveTile(state.board, MoveDirection.RIGHT);
+        let lost = isGameLost(moveOut.cells);
+        return {
+          ...state,
+          board: moveOut.cells,
+          lost,
+          won: moveOut.won,
+          score: state.score + moveOut.score,
+          tiles: moveOut.tiles,
+        };
+      }
+      case "LEFT": {
+        let moveOut = moveTile(state.board, MoveDirection.LEFT);
+        let lost = isGameLost(moveOut.cells);
+        return {
+          ...state,
+          board: moveOut.cells,
+          lost,
+          won: moveOut.won,
+          score: state.score + moveOut.score,
+          tiles: moveOut.tiles,
+        };
+      }
+      default: {
+        return state;
+      }
     }
+  };
+
+  const [boardState, dispatchState] = useReducer(stateReducer, {
+    won: boardStore.won,
+    lost: boardStore.lost,
+    score: boardStore.score,
+    board: boardStore.board,
+    tiles: [],
+  });
+
+  const handleMoveDispatch = (type: ReducerActions) => {
+    if (boardState.lost || boardState.won) return;
+    dispatchState(type);
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -45,23 +170,21 @@ export default function GameBoard() {
     if (event.keyCode > 40 || event.keyCode < 37) return;
     event.preventDefault();
     if (event.repeat) return;
-    if (board.hasWon()) return;
-    if (board.hasLost()) return;
     switch (event.key) {
       case "ArrowUp": {
-        handleMoveTile(MoveDirection.UP);
+        handleMoveDispatch({ type: "UP" });
         break;
       }
       case "ArrowDown": {
-        handleMoveTile(MoveDirection.DOWN);
+        handleMoveDispatch({ type: "DOWN" });
         break;
       }
       case "ArrowRight": {
-        handleMoveTile(MoveDirection.RIGHT);
+        handleMoveDispatch({ type: "RIGHT" });
         break;
       }
       case "ArrowLeft": {
-        handleMoveTile(MoveDirection.LEFT);
+        handleMoveDispatch({ type: "LEFT" });
         break;
       }
       default: {
@@ -74,112 +197,136 @@ export default function GameBoard() {
 
   const touchSwipeHandlers = useSwipeable({
     onSwipedUp: () => {
-      handleMoveTile(MoveDirection.UP);
+      dispatchState({ type: "UP" });
     },
     onSwipedDown: () => {
-      handleMoveTile(MoveDirection.DOWN);
+      dispatchState({ type: "DOWN" });
     },
     onSwipedRight: () => {
-      handleMoveTile(MoveDirection.RIGHT);
+      dispatchState({ type: "RIGHT" });
     },
     onSwipedLeft: () => {
-      handleMoveTile(MoveDirection.LEFT);
+      dispatchState({ type: "LEFT" });
     },
     swipeDuration: 500,
     preventScrollOnSwipe: true,
     trackMouse: true,
   });
 
-  const cells = board.cells.map((row, rowIndex) => {
-    return (
-      <div key={rowIndex} className="flex gap-1 sm:gap-2">
-        {row.map((_, colIndex) => {
-          return (
-            <div
-              className="h-[76px] w-[76px] rounded-md border border-emerald-600 bg-white shadow-sm dark:border-emerald-800 dark:bg-zinc-900 sm:h-32 sm:w-32"
-              key={colIndex}
-            />
-          );
-        })}
-      </div>
-    );
-  });
+  useEffect(() => {
+    dispatchState({ type: "RESTORE" });
+  }, []);
 
-  const tiles = board.tiles
-    .filter((_tile) => _tile.value !== 0)
-    .map((_t, index) => {
-      return <GameTile tile={_t} key={index} />;
-    });
-
-  const handleResetGame = () => {
-    setBoard(new Board(4));
-  };
-
-  const handleCloseWonModal = () => {
-    handleHighScore();
-    setOpenWonModal(false);
-    handleResetGame();
-    setOpenWonModal(true);
-  };
+  useEffect(() => {
+    let highscore =
+      boardState.score > boardStore.highscore
+        ? boardState.score
+        : boardStore.highscore;
+    setBoardStore({ ...boardState, highscore });
+    if (boardState.won || boardState.lost) {
+      setOpenModal(true);
+    }
+  }, [boardState.board]);
 
   return (
-    <div className="flex select-none flex-col-reverse items-center gap-8 md:flex-row md:items-start md:justify-center">
+    <div className="flex w-full flex-col items-center gap-4 lg:flex-row-reverse lg:items-start lg:justify-center">
       <PageMeta title="ManyGames | 2048" description="Play 2048 online" />
-      <div className="relative" {...touchSwipeHandlers}>
-        <div className="flex flex-col gap-1 sm:gap-2">{cells}</div>
-        {tiles}
-      </div>
-      <div className="flex w-full flex-col gap-4 md:w-auto">
-        <div className="flex w-full justify-end">
-          <button
-            onClick={() => setOpenInfoModal(true)}
-            type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
-            aria-label="How to play"
-          >
-            <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
-          </button>
-          <BasicModal
-            title="How to Play"
-            isOpen={openInfoModal}
-            closeModal={setOpenInfoModal}
-            className="max-w-xl"
-          >
-            <div className="mt-2 flex w-full flex-col justify-center gap-2 border-t border-emerald-500 p-4 text-black dark:text-white">
-              <span className="hidden w-full text-sm font-medium leading-relaxed lg:block">
-                You can use arrow keys or drag gesture or swipe on the game
-                board to move the tiles. Tiles with the same number merge into
-                one when they touch. Add them up to reach 2048!
-              </span>
-              <span className="block w-full text-sm font-medium leading-relaxed lg:hidden">
-                You can use drag gesture on the game board to move the tiles.
-                Tiles with the same number merge into one when they touch. Add
-                them up to reach 2048!
-              </span>
-            </div>
-          </BasicModal>
-        </div>
-        <div className="w-full">
-          <GameDetails
-            score={board.score}
-            resetGame={handleResetGame}
-            highScore={highScore}
-          />
-        </div>
-      </div>
-      {(board.hasLost() || board.hasWon()) && (
-        <GameWonLostModal
-          isOpen={openWonModal}
-          closeModal={handleCloseWonModal}
-          isWon={board.hasWon() ? true : false}
-        >
-          <div className="mt-4">
-            <p className="mb-1 text-sm text-gray-500">
-              {`${board.score > highScore ? "New High Score" : "Score"}`}
+      <div className="flex w-full justify-between gap-6 lg:w-auto lg:flex-col">
+        <div className="flex flex-row gap-2 lg:flex-col">
+          <div className="inline rounded-md bg-emerald-400/10 px-2 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 md:px-4">
+            <span className="text-xs sm:text-base">Score</span>
+            <p className="text-base font-semibold sm:text-3xl">
+              {boardState.score}
             </p>
-            <p className="text-3xl font-bold text-emerald-500">{board.score}</p>
           </div>
-        </GameWonLostModal>
+          <div className="inline rounded-md bg-emerald-400/10 px-2 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 md:px-4">
+            <span className="text-xs sm:text-base">High Score</span>
+            <p className="text-base font-semibold sm:text-3xl">
+              {boardStore.highscore}
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-row gap-2 lg:flex-col lg:items-start">
+          <button
+            aria-label="Reset game"
+            onClick={() => dispatchState({ type: "INITIAL" })}
+            type="button"
+            className="flex h-8 w-8 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5 sm:h-10 sm:w-10"
+          >
+            <ArrowPathIcon className="h-7 w-7 stroke-zinc-900 dark:stroke-emerald-300 sm:h-8 sm:w-8" />
+          </button>
+          <button
+            aria-label="Game setting"
+            type="button"
+            className="flex h-8 w-8 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5 sm:h-10 sm:w-10"
+          >
+            <Cog6ToothIcon className="h-7 w-7 stroke-zinc-900 dark:stroke-emerald-300 sm:h-8 sm:w-8" />
+          </button>
+        </div>
+      </div>
+      <div
+        {...touchSwipeHandlers}
+        className={`relative w-max ${styles.gameBoard}`}
+      >
+        <div className="flex flex-col gap-[1vw] sm:gap-[1vh]">
+          {[...Array(4)].map((_, rIndex) => (
+            <div key={rIndex} className="flex gap-[1vw] sm:gap-[1vh]">
+              {[...Array(4)].map((_, cIndex) => {
+                return (
+                  <div
+                    className="h-[22vw] w-[22vw] rounded-[1.5vw] border border-emerald-600 bg-white shadow-sm dark:border-emerald-800 dark:bg-zinc-900 sm:h-[18vh] sm:w-[18vh] sm:rounded-[1vh]"
+                    key={cIndex}
+                  />
+                );
+              })}
+            </div>
+          ))}
+          {boardState.tiles.map((tile, index) => (
+            <NewGameTile tile={tile} key={index} />
+          ))}
+          {boardState.board.map((row, rowIndex) => {
+            return row.map((tile, colIndex) => {
+              return (
+                tile.value !== 0 && (
+                  <NewGameTile
+                    key={rowIndex * BOARD_SIZE + colIndex}
+                    tile={tile}
+                  />
+                )
+              );
+            });
+          })}
+        </div>
+      </div>
+      {openModal && (
+        <BasicModal
+          isOpen={openModal}
+          title={boardState.won ? "You won" : "You lost"}
+          closeModal={setOpenModal}
+          className="max-w-md"
+          confetti={boardState.won && <ConfettiComponent />}
+        >
+          <div className="mt-4 flex w-full items-baseline gap-2 border-t border-emerald-500 py-2 text-base">
+            <span className="text-lg">
+              {boardStore.highscore === boardState.score
+                ? "New highscore "
+                : "Score "}
+            </span>
+            <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+              {boardState.score}
+            </span>
+          </div>
+          <div className="my-2 flex justify-end">
+            <button
+              aria-label="Reset game"
+              onClick={() => dispatchState({ type: "INITIAL" })}
+              type="button"
+              className="flex h-8 w-8 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5 sm:h-10 sm:w-10"
+            >
+              <ArrowPathIcon className="h-7 w-7 stroke-zinc-900 dark:stroke-emerald-300 sm:h-8 sm:w-8" />
+            </button>
+          </div>
+        </BasicModal>
       )}
     </div>
   );
