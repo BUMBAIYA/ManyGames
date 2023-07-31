@@ -6,19 +6,19 @@ import {
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useSwipeable } from "react-swipeable";
+import PageMeta from "../../utility/PageMeta";
 import useLocalStorage from "../../../hooks/useLocalStorage";
-import { useHotkey } from "../../../hooks/useHotKey";
-import GameWonLostModal from "../../modal/GameWonLostModal";
-import { BuildingBoardLoader } from "./BuildingBoardLoader";
-import { ErrorMessage } from "./ErrorMessage";
+import { PuzzleHowToPlay } from "./HowToPlay";
 import { PreviewModal } from "./PreviewModal";
 import { SlidePuzzleSettingModal } from "./SettingModal";
 import { BasicModal } from "../../modal/BasicModal";
+import ConfettiComponent from "../../modal/ConfettiComponent";
+import { useHotkey } from "../../../hooks/useHotKey";
+import { BuildingBoardLoader } from "./BuildingBoardLoader";
+import { ErrorMessage } from "./ErrorMessage";
 import { generateRandomTiles, getPositionOfEmptyTile } from "./helper";
 import { splitImageToTiles, verifyImageUrl } from "../../../utility/image";
 import { classNames } from "../../../utility/css";
-import PageMeta from "../../utility/PageMeta";
-import { PuzzleHowToPlay } from "./HowToPlay";
 
 export const DEFAULT_PUZZLE_IMG_URL = import.meta.env.PROD
   ? "https://manygames.vercel.app/assets/puzzle.jpg"
@@ -351,10 +351,11 @@ export default function SlidePuzzleBoard() {
           )}
         </div>
         {isWon && (
-          <GameWonLostModal
+          <BasicModal
+            title="You won"
             isOpen={openWonModal}
             closeModal={handleCloseWonModal}
-            isWon
+            confetti={<ConfettiComponent />}
           >
             <div className="mt-4">
               <p className="mb-1 text-sm text-gray-500">
@@ -368,7 +369,7 @@ export default function SlidePuzzleBoard() {
                 {boardData.currentMove}
               </p>
             </div>
-          </GameWonLostModal>
+          </BasicModal>
         )}
       </div>
     </>
