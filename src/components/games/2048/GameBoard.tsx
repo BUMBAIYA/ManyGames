@@ -236,7 +236,7 @@ export default function GameBoard() {
           <div className="inline rounded-md bg-emerald-400/10 px-2 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 md:px-4">
             <span className="text-xs sm:text-base">Score</span>
             <p className="text-base font-semibold sm:text-3xl">
-              {boardState.score}
+              {boardStore.score}
             </p>
           </div>
           <div className="inline rounded-md bg-emerald-400/10 px-2 py-1 text-emerald-600 ring-1 ring-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-1 dark:ring-inset dark:ring-emerald-400/20 md:px-4">
@@ -284,7 +284,7 @@ export default function GameBoard() {
           {boardState.tiles.map((tile, index) => (
             <NewGameTile tile={tile} key={index} />
           ))}
-          {boardState.board.map((row, rowIndex) => {
+          {boardStore.board.map((row, rowIndex) => {
             return row.map((tile, colIndex) => {
               return (
                 tile.value !== 0 && (
