@@ -12,12 +12,9 @@ type WordleSettingModalProps = {
 } & BasicModalProps;
 
 export function WordleSettingModal(props: WordleSettingModalProps) {
-  const [mode, setMode] = useState<WordleGameMode>(props.mode);
-
   const handleUpateMode = (mode: WordleGameMode) => {
     if (props.currentAttempt >= 1) return;
     props.submit(mode);
-    setMode(mode);
   };
 
   return (
@@ -48,7 +45,7 @@ export function WordleSettingModal(props: WordleSettingModalProps) {
         <div className="mt-2">
           <RadioGroup
             disabled={props.currentAttempt >= 1}
-            value={mode}
+            value={props.mode}
             onChange={handleUpateMode}
           >
             <RadioGroup.Label className="text-sm text-zinc-600 dark:text-zinc-400">
