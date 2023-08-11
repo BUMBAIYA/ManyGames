@@ -255,13 +255,6 @@ export default function GameBoard() {
           >
             <ArrowPathIcon className="h-7 w-7 stroke-zinc-900 dark:stroke-emerald-300 sm:h-8 sm:w-8" />
           </button>
-          <button
-            aria-label="Game setting"
-            type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5 sm:h-10 sm:w-10"
-          >
-            <Cog6ToothIcon className="h-7 w-7 stroke-zinc-900 dark:stroke-emerald-300 sm:h-8 sm:w-8" />
-          </button>
         </div>
       </div>
       <div
