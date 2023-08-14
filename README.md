@@ -1,13 +1,14 @@
 <div align="center" >
   <img src="./public/manygames.png" width="90" alt="">
-  <br/>
   <h1>Many Games</h1>
+  <br/>
 </div>
 
 <div align="center">
 <a target="_blank" style="font-size: 1.25rem" href="https://manygames.vercel.app">👉 Visit app</a>. Welcome to Many Games, project built with <a target="_blank" href="https://react.dev">React.js</a>, <a target="_blank" href="https://tailwindcss.com">Tailwind CSS</a> and <a target="_blank" href="https://www.typescriptlang.org">TypeScript</a>.
 Many Games is an offline games app where users can play fun, challenging and engaging Puzzle, Word and Memory games. Many Games can be downloaded as a standalone mobile app with chrome browser or play directly on browser. My goal is to add one new game every month.
 </div>
+<br/>
 
 ## 🖥️ Technologies Used
 
