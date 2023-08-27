@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { classNames } from "../../utility/css";
 
 type LinkType = {
-  category: "Puzzle" | "Word";
+  category: "Puzzle" | "Word" | "Memory";
   games: {
     name: string;
     link: string;
@@ -29,6 +29,15 @@ const LINKS: LinkType[] = [
       {
         name: "Wordle",
         link: "wordle",
+      },
+    ],
+  },
+  {
+    category: "Memory",
+    games: [
+      {
+        name: "Memory Match",
+        link: "memorymatch",
       },
     ],
   },
