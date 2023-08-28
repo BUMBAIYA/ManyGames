@@ -22,11 +22,16 @@ export function generateNewTiles(arr: string[], size: number) {
   let tiles: MemoryMatchTile[] = [];
   let randomTiles: string[] = [];
   let duplicateTile = 2;
+  let wrongDuplicate = 2;
   if (size === 4) {
     randomTiles = getRandomLetters(arr, 7);
+  } else if (size === 5) {
+    randomTiles = getRandomLetters(arr, 11);
+    wrongDuplicate = 3;
   } else {
     randomTiles = getRandomLetters(arr, 11);
     duplicateTile = 3;
+    wrongDuplicate = 3;
   }
 
   for (let i = 0; i < randomTiles.length; i++) {
@@ -43,7 +48,7 @@ export function generateNewTiles(arr: string[], size: number) {
     }
   }
 
-  for (let repeatedTile = 0; repeatedTile < duplicateTile; repeatedTile++) {
+  for (let repeatedTile = 0; repeatedTile < wrongDuplicate; repeatedTile++) {
     tiles.push({
       name: INVALID_TEXT,
       id: s4(),
