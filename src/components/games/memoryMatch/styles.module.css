@@ -41,12 +41,12 @@
     transform: translateY(0rem);
   }
   25% {
-    transform: translateY(0.25rem);
+    transform: translateY(0.4rem);
   }
   75% {
-    transform: translateY(-0.25rem);
+    transform: translateY(-0.4rem);
   }
   100% {
-    transform: translateY(0.25rem);
+    transform: translateY(0.4rem);
   }
 }
