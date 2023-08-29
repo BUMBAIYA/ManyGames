@@ -6,6 +6,7 @@ import {
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import styles from "./styles.module.css";
+import useLocalStorage from "../../../hooks/useLocalStorage";
 
 const VALID_LETTERS: string[] = [
   "🍅",
@@ -25,57 +26,132 @@ const VALID_LETTERS: string[] = [
   "🍆",
 ];
 
-type visitedLetter = {
-  commonID: number;
-};
-
 export default function MemoryMatchBoard() {
+  const [boardSize, setBoardSize] = useState<number>(5);
+  const [lost, setLost] = useState<boolean>(false);
+  const [score, setScore] = useLocalStorage<number>("memory-match", 0);
   const refBoard = useRef<HTMLDivElement>(null);
   const [tiles, setTiles] = useState<MemoryMatchTile[]>([]);
-  const [visitedLetter, setVisitedLetter] = useState<visitedLetter[]>([]);
-  const [correctGuessedID, setCorrectGuessedID] = useState<number[]>([]);
+  const [currentTile, setCurrentTile] = useState<MemoryMatchTile | null>(null);
+  const [correctGuessedID, setCorrectGuessedID] = useState<Set<number>>(
+    new Set(),
+  );
 
-  const setVisible = (id: string) => {
-    setTiles((prev) =>
-      prev.map((tile) => {
-        return tile.id === id
-          ? {
-              ...tile,
-              isCurrentlyVisible: true,
-              isVisited: true,
-            }
-          : tile;
-      }),
+  const handleSetVisible = (tile: MemoryMatchTile) => {
+    if (currentTile) {
+      if (currentTile.id === tile.id) return;
+      setScore((prev) => prev + 1);
+      if (tile.commonID === 0 && tile.isVisited === true) {
+        setLost(true);
+        setTiles((prev) =>
+          prev.map((t) => {
+            return t.id === tile.id || t.isCorrectGuessed === true
+              ? { ...t, isCurrentlyVisible: true }
+              : { ...t, isCurrentlyVisible: false };
+          }),
+        );
+      }
+      if (currentTile.commonID === tile.commonID) {
+        if (hasInvisibleTileWithCommonID(currentTile.commonID, tile)) {
+          setCurrentTile(tile);
+          setTiles((prev) =>
+            prev.map((t) => {
+              return t.id === tile.id
+                ? {
+                    ...t,
+                    isCurrentlyVisible: true,
+                    isVisited: true,
+                  }
+                : t;
+            }),
+          );
+        } else {
+          setCurrentTile(tile);
+          setCorrectGuessedID((prev) => prev.add(tile.commonID));
+          setTiles((prev) =>
+            prev.map((t) => {
+              return t.commonID === currentTile.commonID
+                ? {
+                    ...t,
+                    isCurrentlyVisible: true,
+                    isVisited: true,
+                    isCorrectGuessed: true,
+                  }
+                : t;
+            }),
+          );
+        }
+      } else {
+        setCurrentTile(tile);
+        setTiles((prev) =>
+          prev.map((t) => {
+            return t.id === tile.id
+              ? {
+                  ...t,
+                  isCurrentlyVisible: true,
+                  isVisited: true,
+                }
+              : correctGuessedID.has(t.commonID)
+              ? { ...t, isCorrectGuessed: true, isCurrentlyVisible: true }
+              : { ...t, isCurrentlyVisible: false };
+          }),
+        );
+      }
+    } else {
+      setCurrentTile(tile);
+      setScore((prev) => prev + 1);
+      setTiles((prev) =>
+        prev.map((t) => {
+          return t.id === tile.id
+            ? {
+                ...t,
+                isCurrentlyVisible: true,
+                isVisited: true,
+              }
+            : t;
+        }),
+      );
+    }
+  };
+
+  const hasInvisibleTileWithCommonID = (
+    commonID: number,
+    currentTile: MemoryMatchTile,
+  ): boolean => {
+    return tiles.some((tile) =>
+      currentTile.id === tile.id
+        ? false
+        : tile.commonID === commonID && !tile.isCurrentlyVisible,
     );
   };
 
   const handleResetGame = () => {
-    setTiles(generateNewTiles(VALID_LETTERS, 5));
+    setTiles(generateNewTiles(VALID_LETTERS, boardSize));
+    setCorrectGuessedID(new Set<number>());
+    setCurrentTile(null);
+    setLost(false);
   };
 
   const handleBoardSize = (size: number) => {
-    refBoard.current?.style.setProperty("--board-size", `${size}`);
-    setTiles(generateNewTiles(VALID_LETTERS, size));
+    setBoardSize(size);
+    refBoard.current?.style.setProperty("--board-size", `${boardSize}`);
+    setTiles(generateNewTiles(VALID_LETTERS, boardSize));
   };
 
   useEffect(() => {
-    setTiles(generateNewTiles(VALID_LETTERS, 5));
+    handleBoardSize(boardSize);
   }, []);
-
-  useEffect(() => {
-    console.log(tiles);
-  }, [tiles]);
 
   return (
     <div className="flex w-full flex-col-reverse items-center gap-4 lg:flex-row lg:items-start lg:justify-center">
       <div ref={refBoard} className={`${styles.board_grid}`}>
-        {tiles.map((value, index) => {
+        {tiles.map((tile, index) => {
           return (
             <button
               type="button"
               className="relative inline-flex h-full w-full rounded-md border-2 border-emerald-500/40 bg-white p-2 shadow-sm transition-shadow duration-200 hover:shadow-lg dark:bg-zinc-900 dark:hover:shadow-emerald-400/40"
               style={
-                value.isCurrentlyVisible
+                tile.isCurrentlyVisible
                   ? {
                       animation: `500ms linear 100ms ${styles.spinx}`,
                     }
@@ -86,13 +162,16 @@ export default function MemoryMatchBoard() {
                     }
               }
               key={index}
-              onClick={() => setVisible(value.id)}
+              onClick={() => handleSetVisible(tile)}
             >
               <span className="flex h-full w-full items-center justify-center">
-                {!value.isCurrentlyVisible ? value.name : null}
+                {tile.isCurrentlyVisible ? tile.name : null}
               </span>
             </button>
           );
+        })}
+        {Object.entries(correctGuessedID).map(([key, value]) => {
+          return value;
         })}
       </div>
       <div className="flex w-full justify-end lg:w-auto">
