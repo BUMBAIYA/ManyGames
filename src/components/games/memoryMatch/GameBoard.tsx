@@ -4,14 +4,15 @@ import {
   Cog6ToothIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
-import { MemoryMatchHelper as MMH } from "./helper";
+import ConfettiComponent from "../../modal/ConfettiComponent";
 import useLocalStorage from "../../../hooks/useLocalStorage";
+import { MemoryMatchHelper as MMH } from "./helper";
 import { BasicModal } from "../../modal/BasicModal";
 import { MemoryMatchSettingModal } from "./SettingModal";
-import ConfettiComponent from "../../modal/ConfettiComponent";
-import styles from "./styles.module.css";
 import { HowToPlayModal } from "./HowToPlayModal";
 import { GameDetails } from "./GameDetails";
+import { classNames } from "../../../utility/css";
+import styles from "./styles.module.css";
 
 const VALID_LETTERS: string[] = [
   "🍅",
@@ -40,6 +41,7 @@ type MemoryMatchStore = {
   cs: number;
   ls: number | null;
   bs: number;
+  smi: boolean;
 };
 
 export default function MemoryMatchBoard() {
@@ -47,14 +49,17 @@ export default function MemoryMatchBoard() {
   const [isGameWon, setIsGameWon] = useState<boolean>(false);
   const [openWonLostModal, setWonLostModal] = useState<boolean>(false);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
-  const [openHowToPlayModal, setOpenHowToPlayModal] = useState<boolean>(false);
   const [boardStore, setBoardStore] = useLocalStorage<MemoryMatchStore>(
     "memory-match",
     {
       cs: 0,
       ls: null,
       bs: 4,
+      smi: true,
     },
+  );
+  const [openHowToPlayModal, setOpenHowToPlayModal] = useState<boolean>(
+    boardStore.smi,
   );
   const refBoard = useRef<HTMLDivElement>(null);
   const [tiles, setTiles] = useState<MMH.MemoryMatchTile[]>([]);
@@ -279,19 +284,15 @@ export default function MemoryMatchBoard() {
     handleResetGame();
   }, [boardStore.bs]);
 
-  useEffect(() => {
-    console.log(tiles);
-  }, [tiles]);
-
   return (
     <>
       <div className="flex w-full flex-col-reverse items-center gap-4 lg:flex-row lg:items-start lg:justify-center">
-        <div ref={refBoard} className={`${styles.board_grid}`}>
+        <div ref={refBoard} className={classNames(styles.board_grid, "h-full")}>
           {tiles.map((tile, index) => {
             return (
               <button
                 type="button"
-                className="relative inline-flex h-full w-full rounded-md border-2 border-emerald-500/40 bg-white p-2 shadow-sm transition-shadow duration-200 hover:shadow-lg dark:bg-zinc-900 dark:hover:shadow-emerald-400/40"
+                className="relative inline-flex h-full w-full select-none rounded-md border border-emerald-500/70 bg-white p-2 shadow-sm transition-shadow duration-200 hover:shadow-lg dark:bg-zinc-900 dark:hover:shadow-emerald-400/40 md:border-2"
                 style={
                   tile.isCurrentlyVisible
                     ? {
@@ -347,6 +348,13 @@ export default function MemoryMatchBoard() {
               <HowToPlayModal
                 isOpen={openHowToPlayModal}
                 closeModal={setOpenHowToPlayModal}
+                className="max-w-xl"
+                showInitially={boardStore.smi}
+                handleChangeVisiblity={(vis) =>
+                  setBoardStore((prev) => {
+                    return { ...prev, smi: vis };
+                  })
+                }
               />
               <MemoryMatchSettingModal
                 isOpen={openSettingModal}

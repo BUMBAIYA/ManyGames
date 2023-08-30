@@ -66,11 +66,10 @@ export function BasicModal(props: BasicModalProps) {
                     <XMarkIcon className="h-5 w-5 text-zinc-900 dark:text-white" />
                   </button>
                 </div>
-                {children}
                 {showInitially !== undefined && (
-                  <div className="mt-2 flex w-full items-center justify-end gap-2">
+                  <div className="mt-2 flex w-full items-center justify-end gap-2 pt-2">
                     <span className="text-xs sm:text-sm">
-                      Do not show initially
+                      Do not show again
                     </span>
                     <Switch
                       checked={showInitially}
@@ -94,6 +93,7 @@ export function BasicModal(props: BasicModalProps) {
                     </Switch>
                   </div>
                 )}
+                {children}
               </Dialog.Panel>
             </Transition.Child>
           </div>

@@ -33,6 +33,7 @@ type SlidePuzzleData = {
   imageUrl: string;
   highscore: number;
   currentMove: number;
+  smi: boolean;
 };
 
 export default function SlidePuzzleBoard() {
@@ -49,6 +50,7 @@ export default function SlidePuzzleBoard() {
       imageUrl: DEFAULT_PUZZLE_IMG_URL,
       highscore: 0,
       currentMove: 0,
+      smi: true,
     },
   );
   const [tiles, setTiles] = useLocalStorage<number[]>(
@@ -61,7 +63,7 @@ export default function SlidePuzzleBoard() {
   const [openWonModal, setOpenWonModal] = useState<boolean>(false);
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
-  const [openInfoModal, setOpenInfoModal] = useState<boolean>(false);
+  const [openInfoModal, setOpenInfoModal] = useState<boolean>(boardData.smi);
 
   const [emptyTileIndex, setEmptyTileIndex] = useState<number>(0);
 
@@ -231,16 +233,20 @@ export default function SlidePuzzleBoard() {
             >
               <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
             </button>
-            {openInfoModal && (
-              <PuzzleHowToPlay
-                isOpen={openInfoModal}
-                closeModal={setOpenInfoModal}
-                size={boardData.size}
-                imageTiles={imageTiles}
-                aspectRatio={aspectRatio}
-                className="max-w-4xl"
-              />
-            )}
+            <PuzzleHowToPlay
+              isOpen={openInfoModal}
+              closeModal={setOpenInfoModal}
+              size={boardData.size}
+              imageTiles={imageTiles}
+              aspectRatio={aspectRatio}
+              showInitially={boardData.smi}
+              handleChangeVisiblity={(vis) =>
+                setBoardData((prev) => {
+                  return { ...prev, smi: vis };
+                })
+              }
+              className="max-w-4xl"
+            />
           </div>
           <div className="flex w-full justify-between gap-2 lg:flex-col">
             <div className="flex w-full flex-row gap-2 md:w-auto lg:flex-col">

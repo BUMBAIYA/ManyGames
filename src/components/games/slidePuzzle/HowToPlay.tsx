@@ -29,8 +29,16 @@ type ReducerState = {
 type ReducerAction = MoveDirection | "RESET" | "NONE";
 
 export function PuzzleHowToPlay(props: WordleHowToPlayProps) {
-  const { isOpen, closeModal, imageTiles, aspectRatio, size, className } =
-    props;
+  const {
+    isOpen,
+    closeModal,
+    imageTiles,
+    aspectRatio,
+    size,
+    className,
+    showInitially,
+    handleChangeVisiblity,
+  } = props;
   const refTimer = useRef(0);
   const refMoves = useRef(0);
 
@@ -137,6 +145,8 @@ export function PuzzleHowToPlay(props: WordleHowToPlayProps) {
       isOpen={isOpen}
       closeModal={handleCloseModal}
       className={props.className}
+      showInitially={showInitially}
+      handleChangeVisiblity={handleChangeVisiblity}
     >
       <div className="mt-2 flex w-full flex-col gap-2 border-t border-emerald-500 py-2 text-sm">
         <span>You have to complete the puzzle by shuffling the tiles.</span>
