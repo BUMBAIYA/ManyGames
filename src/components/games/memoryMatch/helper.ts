@@ -8,8 +8,6 @@ export namespace MemoryMatchHelper {
     commonID: number;
     isVisited: boolean;
     isCurrentlyVisible: boolean;
-    isDisabled: boolean;
-    isKill: boolean;
     isCorrectGuessed: boolean;
   };
 
@@ -101,9 +99,7 @@ export namespace MemoryMatchHelper {
           id: uuid4(),
           commonID: i + 1,
           isCurrentlyVisible: false,
-          isDisabled: false,
           isVisited: false,
-          isKill: false,
           isCorrectGuessed: false,
         });
       }
@@ -119,9 +115,7 @@ export namespace MemoryMatchHelper {
         id: uuid4(),
         commonID: 0,
         isCurrentlyVisible: false,
-        isDisabled: false,
         isVisited: false,
-        isKill: false,
         isCorrectGuessed: false,
       });
     }
