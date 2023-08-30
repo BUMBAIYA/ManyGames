@@ -72,16 +72,18 @@ export function MemoryMatchSettingModal(props: MemoryMatchSettingModalProps) {
             <span className="font-semibold text-emerald-600 dark:text-emerald-400">
               Easy Mode:
             </span>{" "}
-            Match 2 pair of same emojis by clicking conservative same tile
+            Match 2 pair of same emojis by clicking conservative tile with same
+            emoji.
           </div>
         )}
         {puzzleSize === 5 && (
           <div className="text-sm lg:text-base">
             <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-              Hard Mode:
+              Intermediate Mode:
             </span>{" "}
             <span>
-              Match 2 pair of same emojis by clicking conservative same tile.
+              Match 2 pair of same emojis by clicking conservative tile with
+              same emoji.
             </span>
             <br />
             <span>
@@ -97,7 +99,8 @@ export function MemoryMatchSettingModal(props: MemoryMatchSettingModalProps) {
               Hard Mode:
             </span>{" "}
             <span>
-              Match 3 pair of same emojis by clicking conservative same tile.
+              Match 3 pair of same emojis by clicking conservative tile with
+              same emoji.
             </span>
             <br />
             <span>
