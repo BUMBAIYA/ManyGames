@@ -63,7 +63,7 @@ export function NewGameTile({ tile }: NewGameTileProps) {
   };
 
   let classArray: string[] = [
-    `${styles.tile} inline-flex h-[22vw] w-[22vw] sm:w-[18vh] sm:h-[18vh] items-center justify-center font-bold rounded-[1.5vw] sm:rounded-[1vh] border border-emerald-600 dark:border-none text-[8vw] sm:text-[7vh]`,
+    `${styles.tile} inline-flex h-[22vw] w-[22vw] lg:w-[18vh] lg:h-[18vh] items-center justify-center font-bold rounded-[1.5vw] lg:rounded-[1vh] border border-emerald-600 dark:border-none text-[8vw] lg:text-[7vh]`,
   ];
   classArray.push(colors[value]);
   if (!mergeToTile) classArray.push(`${styles[`pos_${row}_${column}`]}`);

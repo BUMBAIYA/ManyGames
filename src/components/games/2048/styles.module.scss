@@ -34,7 +34,7 @@
   transform: scale(0);
 }
 
-@media screen and (width >= 640px) {
+@media screen and (width >= 1024px) {
   .gameBoard {
     --tile-size: 18vh;
     --tile-gap: 1vh;

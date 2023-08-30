@@ -261,13 +261,13 @@ export default function GameBoard() {
         {...touchSwipeHandlers}
         className={`relative w-max ${styles.gameBoard}`}
       >
-        <div className="flex flex-col gap-[1vw] sm:gap-[1vh]">
+        <div className="flex flex-col gap-[1vw] lg:gap-[1vh]">
           {[...Array(4)].map((_, rIndex) => (
-            <div key={rIndex} className="flex gap-[1vw] sm:gap-[1vh]">
+            <div key={rIndex} className="flex gap-[1vw] lg:gap-[1vh]">
               {[...Array(4)].map((_, cIndex) => {
                 return (
                   <div
-                    className="h-[22vw] w-[22vw] rounded-[1.5vw] border border-emerald-600 bg-white shadow-sm dark:border-emerald-800 dark:bg-zinc-900 sm:h-[18vh] sm:w-[18vh] sm:rounded-[1vh]"
+                    className="h-[22vw] w-[22vw] rounded-[1.5vw] border border-emerald-600 bg-white shadow-sm dark:border-emerald-800 dark:bg-zinc-900 lg:h-[18vh] lg:w-[18vh] lg:rounded-[1vh]"
                     key={cIndex}
                   />
                 );
