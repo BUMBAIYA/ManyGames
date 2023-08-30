@@ -10,6 +10,8 @@ import { BasicModal } from "../../modal/BasicModal";
 import { MemoryMatchSettingModal } from "./SettingModal";
 import ConfettiComponent from "../../modal/ConfettiComponent";
 import styles from "./styles.module.css";
+import { HowToPlayModal } from "./HowToPlayModal";
+import { GameDetails } from "./GameDetails";
 
 const VALID_LETTERS: string[] = [
   "🍅",
@@ -37,19 +39,21 @@ type BoardGridCSS = {
 type MemoryMatchStore = {
   cs: number;
   ls: number | null;
+  bs: number;
 };
 
 export default function MemoryMatchBoard() {
-  const [boardSize, setBoardSize] = useState<number>(5);
   const [isGameLost, setGameLost] = useState<boolean>(false);
   const [isGameWon, setIsGameWon] = useState<boolean>(false);
   const [openWonLostModal, setWonLostModal] = useState<boolean>(false);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
+  const [openHowToPlayModal, setOpenHowToPlayModal] = useState<boolean>(false);
   const [boardStore, setBoardStore] = useLocalStorage<MemoryMatchStore>(
     "memory-match",
     {
       cs: 0,
       ls: null,
+      bs: 4,
     },
   );
   const refBoard = useRef<HTMLDivElement>(null);
@@ -200,31 +204,39 @@ export default function MemoryMatchBoard() {
     ) {
       setIsGameWon(true);
       setWonLostModal(true);
+      handleHighScore();
       return true;
     }
     return false;
   };
 
+  const handleHighScore = () => {
+    if (boardStore.ls === null || boardStore.cs < boardStore.ls) {
+      setBoardStore((prev) => {
+        return { ...prev, ls: boardStore.cs };
+      });
+    }
+  };
+
   const handleResetGame = () => {
-    handleBoardSize(boardSize);
-    setTiles(MMH.generateNewTiles(VALID_LETTERS, boardSize));
+    handleBoardSize(boardStore.bs);
+    setTiles(MMH.generateNewTiles(VALID_LETTERS, boardStore.bs));
     setCorrectGuessedID(new Set<number>());
     setCurrentTile(null);
     setGameLost(false);
     setIsGameWon(false);
-    setBoardStore((prev) => {
-      return { ...prev, cs: 0 };
-    });
   };
 
   const handleBoardSize = (size: number) => {
-    setBoardSize(size);
+    setBoardStore((prev) => {
+      return { ...prev, cs: 0, bs: size };
+    });
     setBoardCssVariables(
       size,
       MMH.MEMORY_MATCH_BOARD_CONFIG[size].gridCSSVar.gridMobile,
       MMH.MEMORY_MATCH_BOARD_CONFIG[size].gridCSSVar.gridDesktop,
     );
-    setTiles(MMH.generateNewTiles(VALID_LETTERS, boardSize));
+    setTiles(MMH.generateNewTiles(VALID_LETTERS, boardStore.bs));
   };
 
   const setBoardCssVariables = (
@@ -245,9 +257,9 @@ export default function MemoryMatchBoard() {
 
   const resetBoardCssVar = () => {
     setBoardCssVariables(
-      boardSize,
-      MMH.MEMORY_MATCH_BOARD_CONFIG[boardSize].gridCSSVar.gridMobile,
-      MMH.MEMORY_MATCH_BOARD_CONFIG[boardSize].gridCSSVar.gridDesktop,
+      boardStore.bs,
+      MMH.MEMORY_MATCH_BOARD_CONFIG[boardStore.bs].gridCSSVar.gridMobile,
+      MMH.MEMORY_MATCH_BOARD_CONFIG[boardStore.bs].gridCSSVar.gridDesktop,
     );
   };
 
@@ -258,14 +270,14 @@ export default function MemoryMatchBoard() {
 
   useLayoutEffect(() => {
     resetBoardCssVar();
-    setTiles(MMH.generateNewTiles(VALID_LETTERS, boardSize));
+    setTiles(MMH.generateNewTiles(VALID_LETTERS, boardStore.bs));
     window.addEventListener("resize", resetBoardCssVar);
     return () => window.removeEventListener("resize", resetBoardCssVar);
-  }, [boardSize]);
+  }, [boardStore.bs]);
 
   useEffect(() => {
     handleResetGame();
-  }, [boardSize]);
+  }, [boardStore.bs]);
 
   useEffect(() => {
     console.log(tiles);
@@ -305,38 +317,49 @@ export default function MemoryMatchBoard() {
           })}
         </div>
         <div className="flex w-full justify-end lg:w-auto">
-          <div className="flex gap-2 lg:flex-col">
-            <button
-              aria-label="How to play"
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
-              onClick={handleResetGame}
-            >
-              <ArrowPathIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
-            </button>
-            <button
-              aria-label="How to play"
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
-              onClick={() => setOpenSettingModal(true)}
-            >
-              <Cog6ToothIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
-            </button>
-            <MemoryMatchSettingModal
-              isOpen={openSettingModal}
-              closeModal={setOpenSettingModal}
-              size={boardSize}
-              handleSubmit={(size) => {
-                setBoardSize(size);
-              }}
-            />
-            <button
-              aria-label="How to play"
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
-            >
-              <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
-            </button>
+          <div className="flex w-full justify-between gap-4 lg:flex-col">
+            <GameDetails score={boardStore.cs} highScore={boardStore.ls} />
+            <div className="flex gap-2 lg:flex-col-reverse">
+              <button
+                aria-label="How to play"
+                type="button"
+                className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
+                onClick={handleResetGame}
+              >
+                <ArrowPathIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
+              </button>
+              <button
+                aria-label="How to play"
+                type="button"
+                className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
+                onClick={() => setOpenSettingModal(true)}
+              >
+                <Cog6ToothIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
+              </button>
+              <button
+                aria-label="How to play"
+                type="button"
+                className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
+                onClick={() => setOpenHowToPlayModal(true)}
+              >
+                <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
+              </button>
+              <HowToPlayModal
+                isOpen={openHowToPlayModal}
+                closeModal={setOpenHowToPlayModal}
+              />
+              <MemoryMatchSettingModal
+                isOpen={openSettingModal}
+                closeModal={setOpenSettingModal}
+                size={boardStore.bs}
+                handleSubmit={(size) => {
+                  if (size === boardStore.bs) return;
+                  setBoardStore((prev) => {
+                    return { ...prev, bs: size, cs: 0 };
+                  });
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -367,7 +390,7 @@ export default function MemoryMatchBoard() {
               <p className="mb-1 text-sm text-gray-500">
                 {`${
                   boardStore.cs < boardStore.ls! ? "New Lowest Score" : "Score"
-                } for size ${boardSize} board`}
+                } for size ${boardStore.bs} board`}
               </p>
               <p className="text-3xl font-bold text-emerald-500">
                 {boardStore.cs}
