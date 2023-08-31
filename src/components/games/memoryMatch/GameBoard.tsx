@@ -292,12 +292,13 @@ export default function MemoryMatchBoard() {
             return (
               <button
                 type="button"
-                className="relative inline-flex h-full w-full select-none rounded-md border border-emerald-500/70 bg-white p-2 shadow-sm transition-shadow duration-200 hover:shadow-lg dark:bg-zinc-900 dark:hover:shadow-emerald-400/40 md:border-2"
+                className={classNames(
+                  "relative inline-flex h-full w-full select-none rounded-md border border-emerald-500/70 bg-white p-2 shadow-sm transition-shadow duration-200 hover:shadow-lg dark:bg-zinc-900 dark:hover:shadow-emerald-400/40 md:border-2",
+                  tile.isCurrentlyVisible ? `${styles.spinx}` : "",
+                )}
                 style={
                   tile.isCurrentlyVisible
-                    ? {
-                        animation: `500ms linear 100ms ${styles.spinx}`,
-                      }
+                    ? {}
                     : {
                         animation: `400ms linear ${(index % 6) * 40}ms ${
                           styles.reset_animation
@@ -318,9 +319,9 @@ export default function MemoryMatchBoard() {
           })}
         </div>
         <div className="flex w-full justify-end lg:w-auto">
-          <div className="flex w-full justify-between gap-4 lg:flex-col">
+          <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row lg:flex-col">
             <GameDetails score={boardStore.cs} highScore={boardStore.ls} />
-            <div className="flex gap-2 lg:flex-col-reverse">
+            <div className="flex w-full justify-end gap-2 lg:flex-col-reverse">
               <button
                 aria-label="How to play"
                 type="button"
@@ -345,17 +346,20 @@ export default function MemoryMatchBoard() {
               >
                 <InformationCircleIcon className="h-8 w-8 stroke-zinc-900 dark:stroke-emerald-300" />
               </button>
-              <HowToPlayModal
-                isOpen={openHowToPlayModal}
-                closeModal={setOpenHowToPlayModal}
-                className="max-w-xl"
-                showInitially={boardStore.smi}
-                handleChangeVisiblity={(vis) =>
-                  setBoardStore((prev) => {
-                    return { ...prev, smi: vis };
-                  })
-                }
-              />
+              {openHowToPlayModal && (
+                <HowToPlayModal
+                  isOpen={openHowToPlayModal}
+                  closeModal={setOpenHowToPlayModal}
+                  className="max-w-3xl"
+                  showInitially={boardStore.smi}
+                  handleChangeVisiblity={(vis) =>
+                    setBoardStore((prev) => {
+                      return { ...prev, smi: vis };
+                    })
+                  }
+                />
+              )}
+
               <MemoryMatchSettingModal
                 isOpen={openSettingModal}
                 closeModal={setOpenSettingModal}

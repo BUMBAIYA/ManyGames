@@ -27,6 +27,10 @@
   }
 }
 
+.spinx {
+  animation: 500ms linear 100ms spinx;
+}
+
 @keyframes show {
   from {
     opacity: 0;
