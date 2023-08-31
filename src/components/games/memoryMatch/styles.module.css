@@ -1,0 +1,56 @@
+.board_grid {
+  --grid-size: 20vw;
+  --grid-gap: 1vw;
+  --font-size: 10vw;
+  --board-size: 5;
+  display: grid;
+  grid-template-columns: repeat(var(--board-size), minmax(0, var(--grid-size)));
+  grid-template-rows: repeat(var(--board-size), minmax(0, var(--grid-size)));
+  gap: var(--grid-gap);
+  font-size: var(--font-size);
+}
+
+@media screen and (width >= 640px) {
+  .board_grid {
+    --grid-size: 12vh;
+    --grid-gap: 1vh;
+    --font-size: 6vh;
+  }
+}
+
+@keyframes spinx {
+  from {
+    transform: rotateY(0);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+.spinx {
+  animation: 500ms linear 100ms spinx;
+}
+
+@keyframes show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reset_animation {
+  0% {
+    transform: translateY(0rem);
+  }
+  25% {
+    transform: translateY(0.4rem);
+  }
+  75% {
+    transform: translateY(-0.4rem);
+  }
+  100% {
+    transform: translateY(0.4rem);
+  }
+}

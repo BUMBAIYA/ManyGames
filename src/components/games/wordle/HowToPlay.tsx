@@ -3,12 +3,14 @@ import { BasicModal, BasicModalProps } from "../../modal/BasicModal";
 type WordleHowToPlayProps = BasicModalProps;
 
 export function WordleHowToPlay(props: WordleHowToPlayProps) {
-  const { isOpen, closeModal } = props;
+  const { isOpen, closeModal, showInitially, handleChangeVisiblity } = props;
   return (
     <BasicModal
       title="How to play"
       isOpen={isOpen}
       closeModal={closeModal}
+      showInitially={showInitially}
+      handleChangeVisiblity={handleChangeVisiblity}
       className="max-w-3xl"
     >
       <div className="mt-2 flex w-full flex-col gap-2 border-t border-emerald-500 py-2 text-base">

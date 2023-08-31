@@ -49,6 +49,12 @@ export default function Hero() {
             title="Wordle"
             description="Short word guessing game"
           />
+          <GameCardFallback
+            imageUrl="/assets/memoryMatch-min.png"
+            link="/memorymatch"
+            title="Memory match"
+            description="Flip and match cards to reveal hidden patterns and images in this classic brain-teasing adventure."
+          />
         </div>
       </div>
     </>

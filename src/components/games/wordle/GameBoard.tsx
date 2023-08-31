@@ -32,6 +32,7 @@ type WordleBoardState = {
   m: WordleGameMode;
   ct: number;
   cu: number;
+  smi: boolean;
 };
 
 const TOTAL_ATTEMPT = 6 as const;
@@ -62,13 +63,14 @@ export default function TestingWordleBoard() {
       m: "NORMAL",
       ct: 0,
       cu: 0,
+      smi: true,
     },
   );
 
   const [wrongGuessedWords, setWrongGuessedWords] = useState<string[]>([]);
   const [validGuessedWords, setValidGuessedWords] = useState<string[]>([]);
 
-  const [openInfoModal, setOpenInfoModal] = useState<boolean>(false);
+  const [openInfoModal, setOpenInfoModal] = useState<boolean>(boardData.smi);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
 
   const { checkWordIsValid, generateWord } = useDictionaryApi();
@@ -335,6 +337,12 @@ export default function TestingWordleBoard() {
           <WordleHowToPlay
             isOpen={openInfoModal}
             closeModal={setOpenInfoModal}
+            showInitially={boardData.smi}
+            handleChangeVisiblity={(vis) =>
+              setBoardData((prev) => {
+                return { ...prev, smi: vis };
+              })
+            }
           />
         </div>
         <div className="relative flex flex-col gap-1">
