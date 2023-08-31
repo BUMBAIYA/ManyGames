@@ -11,7 +11,7 @@ export namespace MemoryMatchHelper {
     isCorrectGuessed: boolean;
   };
 
-  export const MEMORY_MATCH_INVALID_TEXT = "☠️" as const;
+  export const MEMORY_MATCH_INVALID_TEXT = "💣" as const;
 
   type MemoryBoardConfig = {
     duplicate: number;
