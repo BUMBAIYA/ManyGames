@@ -5,6 +5,7 @@ export default function GameError() {
   const handleClearStorage = () => {
     localStorage.clear();
     navigate("/");
+    window.location.reload();
   };
 
   return (
