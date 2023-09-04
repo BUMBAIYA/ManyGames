@@ -29,7 +29,6 @@ const MOVES = [
   [13],
   [12],
   [10],
-  [0],
   [0, 10],
   [0, 10, 15],
   [0, 10, 15, 1],
@@ -86,6 +85,18 @@ export function HowToPlayModal(props: HowToPlayModalProps) {
     closeModal(false);
   };
 
+  const isTileRepeated = (name: string) => {
+    let isRepeated = 0;
+    if (MOVES[refMoves.current].includes(-1)) return false;
+    for (let i = 0; i < MOVES[refMoves.current].length; i++) {
+      if (tiles[MOVES[refMoves.current][i]].name === name) {
+        isRepeated++;
+      } else {
+      }
+    }
+    return isRepeated === 2;
+  };
+
   useEffect(() => {
     refTimer.current = setInterval(() => {
       dispatchMove(MOVES[refMoves.current]);
@@ -94,10 +105,11 @@ export function HowToPlayModal(props: HowToPlayModalProps) {
         refMoves.current = 0;
       }
     }, 1800);
+
     return () => {
       clearInterval(refTimer.current);
     };
-  });
+  }, []);
 
   return (
     <BasicModal
@@ -120,8 +132,11 @@ export function HowToPlayModal(props: HowToPlayModalProps) {
               <div
                 key={index}
                 className={classNames(
-                  "relative inline-flex aspect-square w-full select-none items-center justify-center rounded-md border border-emerald-500/70 bg-white p-2 text-2xl dark:bg-zinc-900 md:border-2",
+                  "relative inline-flex aspect-square w-full select-none items-center justify-center rounded-md border bg-white p-2 text-2xl dark:bg-zinc-900 md:border-2",
                   tile.isCurrentlyVisible ? `${styles.spinx}` : "",
+                  isTileRepeated(tile.name)
+                    ? "border-[#FFD700] bg-gray-300/40 md:border-[3px]"
+                    : "border-emerald-500/70",
                 )}
               >
                 {tile.isCurrentlyVisible ? tile.name : null}
