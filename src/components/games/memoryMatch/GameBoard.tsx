@@ -293,8 +293,11 @@ export default function MemoryMatchBoard() {
               <button
                 type="button"
                 className={classNames(
-                  "relative inline-flex h-full w-full select-none rounded-md border border-emerald-500/70 bg-white p-2 shadow-sm transition-shadow duration-200 hover:shadow-lg dark:bg-zinc-900 dark:hover:shadow-emerald-400/40 md:border-2",
+                  "relative inline-flex h-full w-full select-none rounded-md border bg-white p-2 shadow-sm transition-shadow duration-200 hover:shadow-lg dark:bg-zinc-900 dark:hover:shadow-emerald-400/40 md:border-2",
                   tile.isCurrentlyVisible ? `${styles.spinx}` : "",
+                  tile.isCorrectGuessed
+                    ? "border-[#FFD700] bg-gray-300/40 md:border-[3px]"
+                    : "border-emerald-500/70",
                 )}
                 style={
                   tile.isCurrentlyVisible
@@ -308,14 +311,16 @@ export default function MemoryMatchBoard() {
                 key={tile.id}
                 onClick={() => handleSetVisible(tile)}
               >
-                <span className="flex h-full w-full items-center justify-center">
+                <span
+                  className={classNames(
+                    "flex h-full w-full items-center justify-center",
+                    tile.isCorrectGuessed ? "opacity-75" : "",
+                  )}
+                >
                   {tile.isCurrentlyVisible ? tile.name : null}
                 </span>
               </button>
             );
-          })}
-          {Object.entries(correctGuessedID).map(([key, value]) => {
-            return value;
           })}
         </div>
         <div className="flex w-full justify-end lg:w-auto">
